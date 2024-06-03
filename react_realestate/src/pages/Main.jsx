@@ -32,7 +32,7 @@ export default function Main() {
             <div className="flex h-[100vh]">
                 <SideBar collapsed={isToggled} />
                 <div className="flex flex-col w-full">
-                    <div className='flex flex-row h-16 items-center bg-sidebar'>
+                    <div className='hidden md:flex flex-row h-16 items-center bg-sidebar'>
                         <div className='mx-4 grow hidden md:flex'>
                             <button
                                 className='flex items-center'
