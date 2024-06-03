@@ -16,6 +16,9 @@ export const plugins = [nextui({
         primary: {
           DEFAULT: '#1E1E1E',
         },
+        sidebar: {
+          DEFAULT: '#F9F9F9'
+        }
       },
     },
     dark: {
