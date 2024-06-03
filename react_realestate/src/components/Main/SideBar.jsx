@@ -27,7 +27,7 @@ export default function SideBar({ collapsed }) {
                 <Menu menuItemStyles={menuItemStyles}>
                     <MenuItem
                         icon={<UserIcon className="h-5 w-5" />}
-                        component={<NavLink to="customers" style={getActiveStyles} />}>
+                        component={<NavLink to="customer" style={getActiveStyles} />}>
                         Clientes
                     </MenuItem>
                     <SubMenu label="Pagos" icon={<BanknotesIcon className="h-5 w-5" />}>
