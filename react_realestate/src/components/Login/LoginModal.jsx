@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import Logo from '../../../public/logo.jpg'
+import Logo from '../../assets/images/logo.jpg'
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Link } from "@nextui-org/react";
 import { UserIcon, LockClosedIcon } from '@heroicons/react/24/outline'
 
