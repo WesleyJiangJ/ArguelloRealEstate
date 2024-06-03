@@ -19,8 +19,8 @@ export default function Main() {
         if (sections.length > 1) {
             const section = sections[1];
             switch (section) {
-                case 'customers':
-                    return titles.customers;
+                case 'customer':
+                    return titles.customer;
                 default:
                     return ''
             }
