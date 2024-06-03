@@ -7,7 +7,7 @@ import Customer from './components/Main/Customer';
 function App() {
   const mainData = {
     titles: {
-      customers: 'Clientes',
+      customer: 'Clientes',
     },
   };
   return (
