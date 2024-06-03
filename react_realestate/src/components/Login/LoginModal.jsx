@@ -6,7 +6,7 @@ import { UserIcon, LockClosedIcon } from '@heroicons/react/24/outline'
 export default function LoginModal({ isOpen, onOpenChange }) {
     const navigate = useNavigate();
     const handleClick = () => {
-        navigate('/main/customers');
+        navigate('/main/customer');
     };
 
     return (
