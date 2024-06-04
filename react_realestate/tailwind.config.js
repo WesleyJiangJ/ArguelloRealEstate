@@ -18,6 +18,9 @@ export const plugins = [nextui({
         },
         sidebar: {
           DEFAULT: '#F9F9F9'
+        },
+        card: {
+          DEFAULT: '#F2F5F8'
         }
       },
     },
