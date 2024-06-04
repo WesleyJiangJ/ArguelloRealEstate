@@ -3,6 +3,7 @@ import MainContext from './components/Main/MainContext';
 import Login from "./pages/Login";
 import Main from './pages/Main';
 import Customer from './components/Main/Customer';
+import Detail from './components/Main/Detail';
 
 function App() {
   const mainData = {
@@ -16,7 +17,8 @@ function App() {
         <Routes>
           <Route path='/' element={<Login />} />
           <Route path='/main/*' element={<Main />}>
-            <Route path='customer' element={<Customer />} />
+            <Route path='customer/*' element={<Customer />} />
+            <Route path='customer/detail/:id' element={<Detail />} />
           </Route>
         </Routes>
       </MainContext.Provider>
