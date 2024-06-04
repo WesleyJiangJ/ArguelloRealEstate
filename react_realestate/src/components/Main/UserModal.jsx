@@ -2,8 +2,9 @@ import React from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, DatePicker } from "@nextui-org/react";
 import { useForm, Controller } from "react-hook-form"
 import { getLocalTimeZone, today } from "@internationalized/date";
+import { postCustomer } from "../../api/apiFunctions";
 
-export default function UserModal({ isOpen, onOpenChange }) {
+export default function UserModal({ isOpen, onOpenChange, updateTable }) {
     const { control, handleSubmit, formState: { errors }, reset } = useForm({
         defaultValues: {
             first_name: '',
@@ -18,7 +19,16 @@ export default function UserModal({ isOpen, onOpenChange }) {
         }
     });
     const onSubmit = async (data) => {
-        console.log(data)
+        data.birthdate = data.birthdate.year + '-' + String(data.birthdate.month).padStart(2, '0') + '-' + String(data.birthdate.day).padStart(2, '0')
+        await postCustomer(data)
+            .then(() => {
+                updateTable();
+                onOpenChange(false);
+                reset();
+            })
+            .catch((error) => {
+                console.error('Error: ', error);
+            })
     }
     return (
         <>
@@ -117,6 +127,7 @@ export default function UserModal({ isOpen, onOpenChange }) {
                                                     variant="underlined"
                                                     showMonthAndYearPickers
                                                     maxValue={today(getLocalTimeZone())}
+                                                    errorMessage=' '
                                                 />
                                             )}
                                         />
@@ -172,7 +183,6 @@ export default function UserModal({ isOpen, onOpenChange }) {
                                                 name="email"
                                                 control={control}
                                                 rules={{
-                                                    required: true,
                                                     pattern: {
                                                         value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i
                                                     }
