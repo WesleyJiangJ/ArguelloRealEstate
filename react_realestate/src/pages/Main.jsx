@@ -47,7 +47,7 @@ export default function Main() {
                             <p className='flex items-center justify-end'>Profile</p>
                         </div>
                     </div>
-                    <div className='h-[100vh] p-4'>
+                    <div className='h-full p-2 overflow-auto'>
                         <Outlet />
                     </div>
                 </div>
