@@ -8,7 +8,7 @@ class Customer(models.Model):
     second_surname = models.CharField(max_length=30)
     birthdate = models.DateField()
     phone_number = models.CharField(max_length=8)
-    email = models.EmailField(max_length=255, unique=True, blank=True)
+    email = models.EmailField(max_length=255, blank=True)
     status = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
