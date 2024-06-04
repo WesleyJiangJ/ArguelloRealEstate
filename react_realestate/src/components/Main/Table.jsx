@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate, useParams } from 'react-router-dom'
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, Chip, Pagination, Select, SelectItem, useDisclosure } from "@nextui-org/react";
 import { PlusIcon, ChevronDownIcon } from '@heroicons/react/24/solid'
+import UserModal from "./UserModal";
 
 function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
@@ -55,13 +56,13 @@ export default function Tables({ value, showStatusDropdown, showColumnsDropdown,
         let filteredData = [...axiosData];
 
         if (hasSearchFilter) {
-            filteredData = filteredData.filter(() =>
+            filteredData = filteredData.filter((item) =>
                 eval(cellValues[0].firstValue).toLowerCase().includes(filterValue.toLowerCase()) ||
                 eval(cellValues[0].secondValue).toLowerCase().includes(filterValue.toLowerCase()),
             );
         }
         if (statusFilter !== "all" && Array.from(statusFilter).length !== statusOptions.length) {
-            filteredData = filteredData.filter(() =>
+            filteredData = filteredData.filter((item) =>
                 Array.from(statusFilter).includes(eval(cellValues[2].firstValue).toString()),
             );
         }
@@ -141,7 +142,7 @@ export default function Tables({ value, showStatusDropdown, showColumnsDropdown,
                 <div className={`flex justify-between items-end ${showAddButton || showStatusDropdown ? 'gap-3' : ''}`}>
                     <Input
                         isClearable
-                        className="w-full"
+                        className="w-full -z-0"
                         size="sm"
                         label="Buscar"
                         value={filterValue}
@@ -217,8 +218,9 @@ export default function Tables({ value, showStatusDropdown, showColumnsDropdown,
                             className="w-20"
                             radius="sm">
                             <SelectItem key="5" value="5">5</SelectItem>
-                            <SelectItem key="10" value="10">10</SelectItem>
-                            <SelectItem key="15" value="15">15</SelectItem>
+                            <SelectItem key="20" value="20">20</SelectItem>
+                            <SelectItem key="40" value="40">40</SelectItem>
+                            <SelectItem key="60" value="60">60</SelectItem>
                         </Select>
                     </label>
                 </div>
@@ -292,6 +294,9 @@ export default function Tables({ value, showStatusDropdown, showColumnsDropdown,
                     )}
                 </TableBody>
             </Table>
+            {value === 'Cliente' &&
+                <UserModal isOpen={isOpen} onOpenChange={onOpenChange} updateTable={updateTable}/>
+            }
         </>
     );
 }
