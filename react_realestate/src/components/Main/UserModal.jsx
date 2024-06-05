@@ -1,10 +1,12 @@
 import React from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, DatePicker } from "@nextui-org/react";
 import { useForm, Controller } from "react-hook-form"
-import { getLocalTimeZone, today } from "@internationalized/date";
-import { postCustomer } from "../../api/apiFunctions";
+import { useParams } from "react-router-dom";
+import { getLocalTimeZone, today, parseDate } from "@internationalized/date";
+import { getSpecificCustomer, postCustomer, putCustomer } from "../../api/apiFunctions";
 
-export default function UserModal({ isOpen, onOpenChange, updateTable }) {
+export default function UserModal({ isOpen, onOpenChange, updateTable, reloadData }) {
+    const param = useParams();
     const { control, handleSubmit, formState: { errors }, reset } = useForm({
         defaultValues: {
             first_name: '',
@@ -18,18 +20,42 @@ export default function UserModal({ isOpen, onOpenChange, updateTable }) {
             status: true
         }
     });
+
+    React.useEffect(() => {
+        loadData();
+    }, []);
+
+    const loadData = async () => {
+        const res = ((await getSpecificCustomer(param.id)).data);
+        reset({ ...res, birthdate: parseDate((res.birthdate)) });
+    }
+
     const onSubmit = async (data) => {
         data.birthdate = data.birthdate.year + '-' + String(data.birthdate.month).padStart(2, '0') + '-' + String(data.birthdate.day).padStart(2, '0')
-        await postCustomer(data)
-            .then(() => {
-                updateTable();
-                onOpenChange(false);
-                reset();
-            })
-            .catch((error) => {
-                console.error('Error: ', error);
-            })
+        if (!param.id) {
+            await postCustomer(data)
+                .then(() => {
+                    updateTable();
+                    onOpenChange(false);
+                    reset();
+                })
+                .catch((error) => {
+                    console.error('Error: ', error);
+                })
+        } else {
+            await putCustomer(param.id, data)
+                .then(() => {
+                    reloadData();
+                    loadData();
+                    onOpenChange(false);
+                    reset();
+                })
+                .catch((error) => {
+                    console.error('Error: ', error);
+                })
+        }
     }
+
     return (
         <>
             <Modal
@@ -48,7 +74,7 @@ export default function UserModal({ isOpen, onOpenChange, updateTable }) {
                     {(onClose) => (
                         <>
                             <form onSubmit={handleSubmit(onSubmit)}>
-                                <ModalHeader className="flex flex-col gap-1">Nuevo Cliente</ModalHeader>
+                                <ModalHeader className="flex flex-col gap-1">{param.id ? 'Modificar' : 'Nuevo'} Cliente</ModalHeader>
                                 <ModalBody>
                                     <div className="flex flex-col gap-2">
                                         <div className="flex flex-col md:flex-row gap-2">
