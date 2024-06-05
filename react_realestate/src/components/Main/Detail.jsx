@@ -59,18 +59,18 @@ export default function Detail() {
                             radius="sm"
                             className="bg-card h-full"
                             shadow="none">
-                            <CardBody className="content-stretch gap-2">
+                            <CardBody className="grid content-stretch gap-2">
                                 <Button
                                     color="primary"
                                     radius="sm"
-                                    className="h-full">
+                                    className="h-16 m:h-full lg:h-full">
                                     Modificar
                                 </Button>
                                 <Button
                                     color="success"
                                     radius="sm"
                                     variant="light"
-                                    className="h-full"
+                                    className="h-16 m:h-full lg:h-full"
                                     onClick={() => window.open("https://wa.me/" + `${'here'}`, "_blank")}
                                     startContent={
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-whatsapp" viewBox="0 0 16 16">
@@ -82,7 +82,7 @@ export default function Detail() {
                                     color="danger"
                                     radius="sm"
                                     variant="light"
-                                    className="h-full">
+                                    className="h-16 m:h-full lg:h-full">
                                     Dar de Baja
                                 </Button>
                             </CardBody>
