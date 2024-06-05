@@ -1,8 +1,9 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import { Card, CardHeader, CardBody, Button, Input, useDisclosure } from "@nextui-org/react";
-import { getSpecificCustomer } from "../../api/apiFunctions"
+import { getSpecificCustomer, putCustomer } from "../../api/apiFunctions"
 import { ChatBubbleOvalLeftEllipsisIcon } from "@heroicons/react/24/outline"
+import { sweetAlert } from "./Alert";
 import UserModal from "./UserModal"
 
 export default function Detail() {
@@ -16,6 +17,20 @@ export default function Detail() {
 
     const loadData = async () => {
         setCustomerData((await getSpecificCustomer(param.id)).data);
+    }
+
+    const disableCustomer = async () => {
+        if (customerData.status) customerData.status = false
+        else customerData.status = true
+
+        await sweetAlert(`¿Desea dar de ${customerData.status ? "alta" : "baja"} al cliente?`, '', "warning", "success", "Hecho");
+        await putCustomer(param.id, customerData)
+            .then(() => {
+                loadData();
+            })
+            .catch((error) => {
+                console.error('Error: ', error);
+            })
     }
 
     return (
@@ -94,11 +109,12 @@ export default function Detail() {
                                         Enviar Mensaje
                                     </Button>
                                     <Button
-                                        color="danger"
+                                        color={`${customerData.status ? 'danger' : 'success'}`}
                                         radius="sm"
                                         variant="light"
-                                        className="h-16 m:h-full lg:h-full">
-                                        Dar de Baja
+                                        className="h-16 m:h-full lg:h-full"
+                                        onClick={() => disableCustomer()}>
+                                        Dar de {`${customerData.status ? 'Baja' : 'Alta'}`}
                                     </Button>
                                 </CardBody>
                             </Card>
