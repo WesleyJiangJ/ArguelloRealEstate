@@ -4,6 +4,7 @@ import { useForm, Controller } from "react-hook-form"
 import { useParams } from "react-router-dom";
 import { getLocalTimeZone, today, parseDate } from "@internationalized/date";
 import { getSpecificCustomer, postCustomer, putCustomer } from "../../api/apiFunctions";
+import { sweetAlert, sweetToast } from "./Alert";
 
 export default function UserModal({ isOpen, onOpenChange, updateTable, reloadData }) {
     const param = useParams();
@@ -20,17 +21,29 @@ export default function UserModal({ isOpen, onOpenChange, updateTable, reloadDat
             status: true
         }
     });
+    const [prevData, setPrevData] = React.useState({});
 
     React.useEffect(() => {
         loadData();
     }, []);
 
     const loadData = async () => {
-        const res = ((await getSpecificCustomer(param.id)).data);
-        reset({ ...res, birthdate: parseDate((res.birthdate)) });
+        if (param.id) {
+            const res = ((await getSpecificCustomer(param.id)).data);
+            reset({ ...res, birthdate: parseDate((res.birthdate)) });
+            setPrevData({ ...res, birthdate: parseDate((res.birthdate)).toString() });
+        }
     }
 
     const onSubmit = async (data) => {
+        /*
+            - Converts the date format retrieved from the API into the YYYY-MM-DD format.
+            - If param.id is false, posts a new customer.
+            - If param.id is true:
+                - Updates the customer information.
+                - Checks every possible change that could have occurred.
+                - Checks if the "change" set has any values. If it does, it means that the user made a modification to the customer.
+        */
         data.birthdate = data.birthdate.year + '-' + String(data.birthdate.month).padStart(2, '0') + '-' + String(data.birthdate.day).padStart(2, '0')
         if (!param.id) {
             await postCustomer(data)
@@ -43,16 +56,44 @@ export default function UserModal({ isOpen, onOpenChange, updateTable, reloadDat
                     console.error('Error: ', error);
                 })
         } else {
-            await putCustomer(param.id, data)
-                .then(() => {
-                    reloadData();
-                    loadData();
-                    onOpenChange(false);
-                    reset();
-                })
-                .catch((error) => {
-                    console.error('Error: ', error);
-                })
+            let changes = new Set();
+            for (const key in prevData) {
+                if (prevData[key] !== data[key]) {
+                    if (key === "first_name" || key === "middle_name" || key === "first_surname" || key === "second_surname") {
+                        changes.add("nombre");
+                    }
+                    else if (key === "birthdate") {
+                        changes.add("fecha de nacimiento");
+                    }
+                    else if (key === 'dni') {
+                        changes.add("número de cédula");
+                    }
+                    else if (key === 'phone_number') {
+                        changes.add("celular");
+                    }
+                    else if (key === 'email') {
+                        changes.add("correo");
+                    }
+                }
+            }
+            if (changes.size > 0) {
+                await sweetAlert("¿Confirmar cambios?", `¿Deseas modificar ${Array.from(changes).join(', ')}?`, "warning", "success", "Datos Actualizados");
+                await putCustomer(param.id, data)
+                    .then(() => {
+                        reloadData();
+                        loadData();
+                        onOpenChange(false);
+                        reset();
+                    })
+                    .catch((error) => {
+                        console.error('Error: ', error);
+                    })
+            }
+            else {
+                sweetToast('warning', 'No se realizaron modificaciones');
+                onOpenChange(false);
+                reset();
+            }
         }
     }
 
