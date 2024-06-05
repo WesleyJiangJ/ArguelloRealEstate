@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MinLengthValidator
 
 
 class Customer(models.Model):
@@ -7,6 +8,7 @@ class Customer(models.Model):
     first_surname = models.CharField(max_length=30)
     second_surname = models.CharField(max_length=30)
     birthdate = models.DateField()
+    dni = models.CharField(max_length=16, validators=[MinLengthValidator(16)])
     phone_number = models.CharField(max_length=8)
     email = models.EmailField(max_length=255, blank=True)
     status = models.BooleanField(default=True)
