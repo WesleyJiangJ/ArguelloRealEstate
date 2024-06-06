@@ -16,6 +16,10 @@ const notesAPI = axios.create({
     baseURL: 'http://localhost:8000/notes/'
 })
 
+const plotAPI = axios.create({
+    baseURL: 'http://localhost:8000/plot/'
+})
+
 // Customer
 export const getAllCustomers = () => {
     return customerAPI.get('/');
@@ -65,4 +69,21 @@ export const getNote = (model, id, noteID) => {
 
 export const deleteNote = (id) => {
     return notesAPI.delete(`/${id}/`);
+}
+
+// Plot
+export const getAllPlots = () => {
+    return plotAPI.get('/');
+}
+
+export const getSpecificPlot = () => {
+    return plotAPI.get(`/${id}`);
+}
+
+export const putPlot = () => {
+    return plotAPI.put(`/${id}/`, data);
+}
+
+export const postPlot = () => {
+    return plotAPI.post('/', data);
 }
