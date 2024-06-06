@@ -5,6 +5,7 @@ import Main from './pages/Main';
 import Customer from './components/Main/Customer';
 import Detail from './components/Main/Detail';
 import Personal from './components/Main/Personal';
+import Sales from './components/Main/Sales';
 
 function App() {
   const mainData = {
@@ -23,6 +24,7 @@ function App() {
             <Route path='customer/detail/:id' element={<Detail value={"Clientes"} />} />
             <Route path='personal/*' element={<Personal />} />
             <Route path='personal/detail/:id' element={<Detail value={"Personal"} />} />
+            <Route path='sales/*' element={<Sales />} />
           </Route>
         </Routes>
       </MainContext.Provider>
