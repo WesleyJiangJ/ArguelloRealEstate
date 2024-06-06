@@ -1,15 +1,26 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import { Card, CardHeader, CardBody, Button, Input, useDisclosure } from "@nextui-org/react";
-import { getSpecificCustomer, putCustomer } from "../../api/apiFunctions"
-import { ChatBubbleOvalLeftEllipsisIcon } from "@heroicons/react/24/outline"
-import { sweetAlert } from "./Alert";
+import { useForm, Controller } from "react-hook-form"
+import { Card, CardHeader, CardBody, Button, Input, Textarea, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, useDisclosure } from "@nextui-org/react";
+import { getSpecificCustomer, putCustomer, postNote, getNotes, getNote, deleteNote } from "../../api/apiFunctions"
+import { ChatBubbleOvalLeftEllipsisIcon, PlusIcon, ArrowPathIcon, TrashIcon } from "@heroicons/react/24/outline"
+import { sweetAlert, sweetToast } from "./Alert";
 import UserModal from "./UserModal"
 
 export default function Detail() {
     const param = useParams();
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const [customerData, setCustomerData] = React.useState([]);
+    const [customerNotes, setCustomerNotes] = React.useState([]);
+    const [customerNoteID, setCustomerNoteID] = React.useState('');
+    const { control, handleSubmit, formState: { errors }, reset } = useForm({
+        defaultValues: {
+            name: '',
+            content: '',
+            object_id: parseInt(param.id),
+            content_type: 7
+        }
+    });
 
     React.useEffect(() => {
         loadData();
@@ -17,6 +28,7 @@ export default function Detail() {
 
     const loadData = async () => {
         setCustomerData((await getSpecificCustomer(param.id)).data);
+        setCustomerNotes((await getNotes(param.id)).data);
     }
 
     const disableCustomer = async () => {
@@ -27,6 +39,18 @@ export default function Detail() {
         await putCustomer(param.id, customerData)
             .then(() => {
                 loadData();
+            })
+            .catch((error) => {
+                console.error('Error: ', error);
+            })
+    }
+
+    const onSubmit = async (data) => {
+        sweetToast('success', 'Nota guardada');
+        await postNote(data)
+            .then(() => {
+                loadData();
+                reset();
             })
             .catch((error) => {
                 console.error('Error: ', error);
@@ -137,10 +161,115 @@ export default function Detail() {
                                 radius="sm"
                                 className="bg-card h-full"
                                 shadow="none">
-                                <CardHeader>
-                                    <h4 className="font-bold text-medium">Notas</h4>
-                                </CardHeader>
-                                <CardBody></CardBody>
+                                <form onSubmit={handleSubmit(onSubmit)}>
+                                    <CardHeader className="flex flex-row justify-between">
+                                        <h4 className="font-bold text-medium">Notas</h4>
+                                        <div className="flex gap-2">
+                                            {customerNoteID.length > 0 &&
+                                                <>
+                                                    <Button
+                                                        isIconOnly
+                                                        variant="light"
+                                                        color="danger"
+                                                        radius="sm"
+                                                        size="sm"
+                                                        onClick={async () => {
+                                                            await sweetAlert('¿Desea eliminar la nota?', '', 'warning', 'success', 'Nota Eliminada');
+                                                            await deleteNote(customerNoteID)
+                                                                .then(() => {
+                                                                    loadData();
+                                                                    reset({ name: '', content: '', object_id: parseInt(param.id), content_type: 7 });
+                                                                    setCustomerData('');
+                                                                })
+                                                                .catch((error) => {
+                                                                    console.error('Error: ', error);
+                                                                })
+                                                        }}>
+                                                        <TrashIcon className="w-5 h-5" />
+                                                    </Button>
+                                                    <Button
+                                                        isIconOnly
+                                                        variant="light"
+                                                        color="primary"
+                                                        radius="sm"
+                                                        size="sm"
+                                                        onClick={() => {
+                                                            reset({ name: '', content: '', object_id: parseInt(param.id), content_type: 7 });
+                                                            setCustomerNoteID('');
+                                                        }}>
+                                                        <ArrowPathIcon className="w-5 h-5" />
+                                                    </Button>
+                                                </>
+                                            }
+                                            {!customerNoteID.length > 0 &&
+                                                <Button
+                                                    isIconOnly
+                                                    color="primary"
+                                                    variant="light"
+                                                    radius="sm"
+                                                    size="sm"
+                                                    type="submit">
+                                                    <PlusIcon className="w-5 h-5" />
+                                                </Button>
+                                            }
+                                        </div>
+                                    </CardHeader>
+                                    <CardBody className="gap-2">
+                                        <Controller
+                                            name="name"
+                                            control={control}
+                                            rules={{ required: true }}
+                                            render={({ field }) => (
+                                                <Input
+                                                    {...field}
+                                                    label='Nombre'
+                                                    variant="underlined"
+                                                    isInvalid={errors.name ? true : false}
+                                                    isReadOnly={customerNoteID.length > 0}
+                                                />
+                                            )}
+                                        />
+                                        <Controller
+                                            name="content"
+                                            control={control}
+                                            rules={{ required: true }}
+                                            render={({ field }) => (
+                                                <Textarea
+                                                    {...field}
+                                                    label="Nota"
+                                                    placeholder="Escribe aquí . . ."
+                                                    variant="underlined"
+                                                    minRows={5}
+                                                    maxRows={5}
+                                                    maxLength={256}
+                                                    isInvalid={errors.content ? true : false}
+                                                    isReadOnly={customerNoteID.length > 0}
+                                                />
+                                            )}
+                                        />
+                                        <Table
+                                            aria-label="Notes Table"
+                                            hideHeader
+                                            radius="sm"
+                                            shadow="none"
+                                            selectionMode="single"
+                                            onRowAction={async (key) => {
+                                                reset(...(await getNote(param.id, key)).data);
+                                                setCustomerNoteID(key);
+                                            }}>
+                                            <TableHeader>
+                                                <TableColumn></TableColumn>
+                                            </TableHeader>
+                                            <TableBody emptyContent={"No se encontraron notas"}>
+                                                {customerNotes.map((note) =>
+                                                    <TableRow key={note.id} className="cursor-pointer">
+                                                        {() => <TableCell>{note.name}</TableCell>}
+                                                    </TableRow>
+                                                )}
+                                            </TableBody>
+                                        </Table>
+                                    </CardBody>
+                                </form>
                             </Card>
                         </div>
                     </div>
