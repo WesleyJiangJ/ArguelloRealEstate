@@ -3,10 +3,10 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input
 import { useForm, Controller } from "react-hook-form"
 import { useParams } from "react-router-dom";
 import { getLocalTimeZone, today, parseDate } from "@internationalized/date";
-import { getSpecificCustomer, postCustomer, putCustomer } from "../../api/apiFunctions";
+import { getSpecificCustomer, getSpecificPersonal, postCustomer, postPersonal, putCustomer, putPersonal } from "../../api/apiFunctions";
 import { sweetAlert, sweetToast } from "./Alert";
 
-export default function UserModal({ isOpen, onOpenChange, updateTable, reloadData }) {
+export default function UserModal({ isOpen, onOpenChange, updateTable, reloadData, typeOfData }) {
     const param = useParams();
     const { control, handleSubmit, formState: { errors }, reset } = useForm({
         defaultValues: {
@@ -29,9 +29,16 @@ export default function UserModal({ isOpen, onOpenChange, updateTable, reloadDat
 
     const loadData = async () => {
         if (param.id) {
-            const res = ((await getSpecificCustomer(param.id)).data);
-            reset({ ...res, birthdate: parseDate((res.birthdate)) });
-            setPrevData({ ...res, birthdate: parseDate((res.birthdate)).toString() });
+            if (typeOfData === 'Clientes') {
+                const res = ((await getSpecificCustomer(param.id)).data);
+                reset({ ...res, birthdate: parseDate((res.birthdate)) });
+                setPrevData({ ...res, birthdate: parseDate((res.birthdate)).toString() });
+            }
+            else {
+                const res = ((await getSpecificPersonal(param.id)).data);
+                reset({ ...res, birthdate: parseDate((res.birthdate)) });
+                setPrevData({ ...res, birthdate: parseDate((res.birthdate)).toString() });
+            }
         }
     }
 
@@ -46,15 +53,28 @@ export default function UserModal({ isOpen, onOpenChange, updateTable, reloadDat
         */
         data.birthdate = data.birthdate.year + '-' + String(data.birthdate.month).padStart(2, '0') + '-' + String(data.birthdate.day).padStart(2, '0')
         if (!param.id) {
-            await postCustomer(data)
-                .then(() => {
-                    updateTable();
-                    onOpenChange(false);
-                    reset();
-                })
-                .catch((error) => {
-                    console.error('Error: ', error);
-                })
+            if (typeOfData === 'Clientes') {
+                await postCustomer(data)
+                    .then(() => {
+                        updateTable();
+                        onOpenChange(false);
+                        reset();
+                    })
+                    .catch((error) => {
+                        console.error('Error: ', error);
+                    })
+            }
+            else {
+                await postPersonal(data)
+                    .then(() => {
+                        updateTable();
+                        onOpenChange(false);
+                        reset();
+                    })
+                    .catch((error) => {
+                        console.error('Error: ', error);
+                    })
+            }
         } else {
             let changes = new Set();
             for (const key in prevData) {
@@ -78,16 +98,30 @@ export default function UserModal({ isOpen, onOpenChange, updateTable, reloadDat
             }
             if (changes.size > 0) {
                 await sweetAlert("¿Confirmar cambios?", `¿Deseas modificar ${Array.from(changes).join(', ')}?`, "warning", "success", "Datos Actualizados");
-                await putCustomer(param.id, data)
-                    .then(() => {
-                        reloadData();
-                        loadData();
-                        onOpenChange(false);
-                        reset();
-                    })
-                    .catch((error) => {
-                        console.error('Error: ', error);
-                    })
+                if (typeOfData === 'Clientes') {
+                    await putCustomer(param.id, data)
+                        .then(() => {
+                            reloadData();
+                            loadData();
+                            onOpenChange(false);
+                            reset();
+                        })
+                        .catch((error) => {
+                            console.error('Error: ', error);
+                        })
+                }
+                else {
+                    await putPersonal(param.id, data)
+                        .then(() => {
+                            reloadData();
+                            loadData();
+                            onOpenChange(false);
+                            reset();
+                        })
+                        .catch((error) => {
+                            console.error('Error: ', error);
+                        })
+                }
             }
             else {
                 sweetToast('warning', 'No se realizaron modificaciones');
@@ -115,7 +149,7 @@ export default function UserModal({ isOpen, onOpenChange, updateTable, reloadDat
                     {(onClose) => (
                         <>
                             <form onSubmit={handleSubmit(onSubmit)}>
-                                <ModalHeader className="flex flex-col gap-1">{param.id ? 'Modificar' : 'Nuevo'} Cliente</ModalHeader>
+                                <ModalHeader className="flex flex-col gap-1">{param.id ? 'Modificar' : 'Nuevo'} {typeOfData === 'Clientes' ? 'Cliente' : 'Personal'}</ModalHeader>
                                 <ModalBody>
                                     <div className="flex flex-col gap-2">
                                         <div className="flex flex-col md:flex-row gap-2">
