@@ -9,6 +9,11 @@ class CustomerViewSet(viewsets.ModelViewSet):
     serializer_class = CustomerSerializer
 
 
+class PersonalViewSet(viewsets.ModelViewSet):
+    queryset = Personal.objects.all()
+    serializer_class = PersonalSerializer
+
+
 class NotesViewSet(viewsets.ModelViewSet):
     queryset = Notes.objects.all()
     serializer_class = NotesSerializer
