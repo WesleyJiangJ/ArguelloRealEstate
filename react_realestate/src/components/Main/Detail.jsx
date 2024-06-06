@@ -87,7 +87,7 @@ export default function Detail({ value }) {
                                 className="bg-card h-full"
                                 shadow="none">
                                 <CardHeader>
-                                    <h4 className="font-bold text-medium">Información del Cliente</h4>
+                                    <h4 className="font-bold text-medium">Información del {value === 'Clientes' ? 'Cliente' : 'Personal'}</h4>
                                 </CardHeader>
                                 <CardBody className="flex flex-col justify-center h-full">
                                     <div className="flex-1 flex flex-col justify-evenly">
