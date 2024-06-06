@@ -55,12 +55,12 @@ export const postNote = (data) => {
     return notesAPI.post('/', data);
 }
 
-export const getNotes = (id) => {
-    return notesAPI.get(`?content_type__app_label=api&content_type__model=customer&object_id=${id}`);
+export const getNotes = (model, id) => {
+    return notesAPI.get(`?content_type__app_label=api&content_type__model=${model}&object_id=${id}`);
 }
 
-export const getNote = (id, noteID) => {
-    return notesAPI.get(`?content_type__app_label=api&content_type__model=customer&object_id=${id}&id=${noteID}`);
+export const getNote = (model, id, noteID) => {
+    return notesAPI.get(`?content_type__app_label=api&content_type__model=${model}&object_id=${id}&id=${noteID}`);
 }
 
 export const deleteNote = (id) => {
