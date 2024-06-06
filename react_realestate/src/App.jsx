@@ -20,8 +20,9 @@ function App() {
           <Route path='/' element={<Login />} />
           <Route path='/main/*' element={<Main />}>
             <Route path='customer/*' element={<Customer />} />
-            <Route path='customer/detail/:id' element={<Detail />} />
+            <Route path='customer/detail/:id' element={<Detail value={"customer"} />} />
             <Route path='personal/*' element={<Personal />} />
+            <Route path='personal/detail/:id' element={<Detail value={"personal"} />} />
           </Route>
         </Routes>
       </MainContext.Provider>
