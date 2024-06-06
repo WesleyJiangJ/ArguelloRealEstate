@@ -76,14 +76,14 @@ export const getAllPlots = () => {
     return plotAPI.get('/');
 }
 
-export const getSpecificPlot = () => {
+export const getSpecificPlot = (id) => {
     return plotAPI.get(`/${id}`);
 }
 
-export const putPlot = () => {
+export const putPlot = (id, data) => {
     return plotAPI.put(`/${id}/`, data);
 }
 
-export const postPlot = () => {
+export const postPlot = (data) => {
     return plotAPI.post('/', data);
 }
