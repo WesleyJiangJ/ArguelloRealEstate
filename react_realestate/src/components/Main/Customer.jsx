@@ -54,7 +54,7 @@ export default function Customer() {
     return (
         <>
             <Table
-                value={"Cliente"}
+                value={"User"}
                 showStatusDropdown={true}
                 showColumnsDropdown={true}
                 showAddButton={true}
