@@ -54,11 +54,11 @@ export default function Customer() {
     return (
         <>
             <Table
-                value={"User"}
+                value={"Clientes"}
                 showStatusDropdown={true}
                 showColumnsDropdown={true}
                 showAddButton={true}
-                typeOfData={"Clientes"}
+                typeOfData={"Usuarios"}
                 axiosResponse={customerData}
                 fetchData={fetchData}
                 INITIAL_VISIBLE_COLUMNS={INITIAL_VISIBLE_COLUMNS}

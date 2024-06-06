@@ -54,11 +54,11 @@ export default function Personal() {
     return (
         <>
             <Table
-                value={"User"}
+                value={"Personal"}
                 showStatusDropdown={true}
                 showColumnsDropdown={true}
                 showAddButton={true}
-                typeOfData={"Personal"}
+                typeOfData={"Usuarios"}
                 axiosResponse={personalData}
                 fetchData={fetchData}
                 INITIAL_VISIBLE_COLUMNS={INITIAL_VISIBLE_COLUMNS}
