@@ -294,9 +294,9 @@ export default function Tables({ value, showStatusDropdown, showColumnsDropdown,
                     )}
                 </TableBody>
             </Table>
-            {value === 'User' &&
-                <UserModal isOpen={isOpen} onOpenChange={onOpenChange} updateTable={updateTable} typeOfData={typeOfData}/>
-            } 
+            {typeOfData === 'Usuarios' &&
+                <UserModal isOpen={isOpen} onOpenChange={onOpenChange} updateTable={updateTable} value={value} />
+            }
         </>
     );
 }
