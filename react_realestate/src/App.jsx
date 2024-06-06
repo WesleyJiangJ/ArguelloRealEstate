@@ -11,7 +11,8 @@ function App() {
   const mainData = {
     titles: {
       customer: 'Clientes',
-      personal: 'Personal'
+      personal: 'Personal',
+      sales: 'Ventas'
     },
   };
   return (

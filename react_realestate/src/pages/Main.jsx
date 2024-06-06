@@ -23,6 +23,8 @@ export default function Main() {
                     return titles.customer;
                 case 'personal':
                     return titles.personal;
+                case 'sales':
+                    return titles.sales;
                 default:
                     return ''
             }
