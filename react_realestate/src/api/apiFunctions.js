@@ -8,6 +8,10 @@ const customerAPI = axios.create({
     baseURL: 'http://localhost:8000/customer/'
 })
 
+const personalAPI = axios.create({
+    baseURL: 'http://localhost:8000/personal/'
+})
+
 const notesAPI = axios.create({
     baseURL: 'http://localhost:8000/notes/'
 })
@@ -27,6 +31,23 @@ export const putCustomer = (id, data) => {
 
 export const postCustomer = (data) => {
     return customerAPI.post('/', data);
+}
+
+// Personal
+export const getAllPersonal = () => {
+    return personalAPI.get('/');
+}
+
+export const getSpecificPersonal = (id) => {
+    return personalAPI.get(`/${id}`);
+}
+
+export const putPersonal = (id, data) => {
+    return personalAPI.put(`/${id}/`, data);
+}
+
+export const postPersonal = (data) => {
+    return personalAPI.post('/', data);
 }
 
 // Notes
