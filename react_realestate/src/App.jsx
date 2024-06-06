@@ -29,7 +29,7 @@ function App() {
             <Route path='personal/detail/:id' element={<Detail value={"Personal"} />} />
             <Route path='sales/*' element={<Sales />} />
             <Route path='settings/*' element={<Settings />}>
-              <Route path='plot/id' element={<PlotModal />} />
+              <Route path='plot/:id' element={<PlotModal />} />
             </Route>
           </Route>
         </Routes>
