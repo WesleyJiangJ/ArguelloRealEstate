@@ -2,23 +2,23 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form"
 import { Card, CardHeader, CardBody, Button, Input, Textarea, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, useDisclosure } from "@nextui-org/react";
-import { getSpecificCustomer, putCustomer, postNote, getNotes, getNote, deleteNote } from "../../api/apiFunctions"
+import { getSpecificCustomer, putCustomer, postNote, getNotes, getNote, deleteNote, getSpecificPersonal, putPersonal } from "../../api/apiFunctions"
 import { ChatBubbleOvalLeftEllipsisIcon, PlusIcon, ArrowPathIcon, TrashIcon } from "@heroicons/react/24/outline"
 import { sweetAlert, sweetToast } from "./Alert";
 import UserModal from "./UserModal"
 
-export default function Detail() {
+export default function Detail({ value }) {
     const param = useParams();
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
-    const [customerData, setCustomerData] = React.useState([]);
-    const [customerNotes, setCustomerNotes] = React.useState([]);
-    const [customerNoteID, setCustomerNoteID] = React.useState('');
-    const { control, handleSubmit, formState: { errors }, reset } = useForm({
+    const [userData, setUserData] = React.useState([]);
+    const [notes, setNotes] = React.useState([]);
+    const [noteID, setNoteID] = React.useState('');
+    const { control, handleSubmit, formState: { errors }, reset, setValue } = useForm({
         defaultValues: {
             name: '',
             content: '',
             object_id: parseInt(param.id),
-            content_type: 7
+            content_type: ''
         }
     });
 
@@ -27,22 +27,41 @@ export default function Detail() {
     }, []);
 
     const loadData = async () => {
-        setCustomerData((await getSpecificCustomer(param.id)).data);
-        setCustomerNotes((await getNotes(param.id)).data);
+        if (value === "Clientes") {
+            setUserData((await getSpecificCustomer(param.id)).data);
+            setNotes((await getNotes('customer', param.id)).data);
+            setValue('content_type', 7);
+        }
+        else {
+            setUserData((await getSpecificPersonal(param.id)).data);
+            setNotes((await getNotes('personal', param.id)).data);
+            setValue('content_type', 9);
+        }
     }
 
-    const disableCustomer = async () => {
-        if (customerData.status) customerData.status = false
-        else customerData.status = true
+    const disableUser = async () => {
+        if (userData.status) userData.status = false
+        else userData.status = true
 
-        await sweetAlert(`¿Desea dar de ${customerData.status ? "alta" : "baja"} al cliente?`, '', "warning", "success", "Hecho");
-        await putCustomer(param.id, customerData)
-            .then(() => {
-                loadData();
-            })
-            .catch((error) => {
-                console.error('Error: ', error);
-            })
+        await sweetAlert(`¿Desea dar de ${userData.status ? "alta" : "baja"} al ${value === 'Clientes' ? 'cliente' : 'personal'}?`, '', "warning", "success", "Hecho");
+        if (value === 'Clientes') {
+            await putCustomer(param.id, userData)
+                .then(() => {
+                    loadData();
+                })
+                .catch((error) => {
+                    console.error('Error: ', error);
+                })
+        }
+        else {
+            await putPersonal(param.id, userData)
+                .then(() => {
+                    loadData();
+                })
+                .catch((error) => {
+                    console.error('Error: ', error);
+                })
+        }
     }
 
     const onSubmit = async (data) => {
@@ -77,33 +96,33 @@ export default function Detail() {
                                                 variant="underlined"
                                                 isReadOnly
                                                 label='Nombre Completo'
-                                                value={`${customerData.first_name} ${customerData.middle_name} ${customerData.first_surname} ${customerData.second_surname}`}
+                                                value={`${userData.first_name} ${userData.middle_name} ${userData.first_surname} ${userData.second_surname}`}
                                             />
                                             <Input
                                                 variant="underlined"
                                                 isReadOnly
                                                 label="Fecha de Nacimiento"
-                                                value={`${customerData.birthdate}`}
+                                                value={`${userData.birthdate}`}
                                             />
                                         </div>
                                         <Input
                                             variant="underlined"
                                             isReadOnly
                                             label="Cédula"
-                                            value={`${customerData.dni}`}
+                                            value={`${userData.dni}`}
                                         />
                                         <div className="flex flex-col md:flex-row gap-2">
                                             <Input
                                                 variant="underlined"
                                                 isReadOnly
                                                 label="Celular"
-                                                value={`+505 ${customerData.phone_number}`}
+                                                value={`+505 ${userData.phone_number}`}
                                             />
                                             <Input
                                                 variant="underlined"
                                                 isReadOnly
                                                 label="Correo"
-                                                value={`${customerData.email}`}
+                                                value={`${userData.email}`}
                                             />
                                         </div>
                                     </div>
@@ -128,17 +147,17 @@ export default function Detail() {
                                         radius="sm"
                                         variant="light"
                                         className="h-16 m:h-full lg:h-full"
-                                        onClick={() => window.open("https://wa.me/" + `${customerData.phone_number}`, "_blank")}
+                                        onClick={() => window.open("https://wa.me/" + `${userData.phone_number}`, "_blank")}
                                         startContent={<ChatBubbleOvalLeftEllipsisIcon className="w-5 h-5" />}>
                                         Enviar Mensaje
                                     </Button>
                                     <Button
-                                        color={`${customerData.status ? 'danger' : 'success'}`}
+                                        color={`${userData.status ? 'danger' : 'success'}`}
                                         radius="sm"
                                         variant="light"
                                         className="h-16 m:h-full lg:h-full"
-                                        onClick={() => disableCustomer()}>
-                                        Dar de {`${customerData.status ? 'Baja' : 'Alta'}`}
+                                        onClick={() => disableUser()}>
+                                        Dar de {`${userData.status ? 'Baja' : 'Alta'}`}
                                     </Button>
                                 </CardBody>
                             </Card>
@@ -165,7 +184,7 @@ export default function Detail() {
                                     <CardHeader className="flex flex-row justify-between">
                                         <h4 className="font-bold text-medium">Notas</h4>
                                         <div className="flex gap-2">
-                                            {customerNoteID.length > 0 &&
+                                            {noteID.length > 0 &&
                                                 <>
                                                     <Button
                                                         isIconOnly
@@ -175,11 +194,11 @@ export default function Detail() {
                                                         size="sm"
                                                         onClick={async () => {
                                                             await sweetAlert('¿Desea eliminar la nota?', '', 'warning', 'success', 'Nota Eliminada');
-                                                            await deleteNote(customerNoteID)
+                                                            await deleteNote(noteID)
                                                                 .then(() => {
                                                                     loadData();
-                                                                    reset({ name: '', content: '', object_id: parseInt(param.id), content_type: 7 });
-                                                                    setCustomerData('');
+                                                                    reset({ name: '', content: '', object_id: parseInt(param.id), content_type: value === 'customer' ? 7 : 9 });
+                                                                    setUserData('');
                                                                 })
                                                                 .catch((error) => {
                                                                     console.error('Error: ', error);
@@ -194,14 +213,14 @@ export default function Detail() {
                                                         radius="sm"
                                                         size="sm"
                                                         onClick={() => {
-                                                            reset({ name: '', content: '', object_id: parseInt(param.id), content_type: 7 });
-                                                            setCustomerNoteID('');
+                                                            reset({ name: '', content: '', object_id: parseInt(param.id), content_type: value === 'customer' ? 7 : 9 });
+                                                            setNoteID('');
                                                         }}>
                                                         <ArrowPathIcon className="w-5 h-5" />
                                                     </Button>
                                                 </>
                                             }
-                                            {!customerNoteID.length > 0 &&
+                                            {!noteID.length > 0 &&
                                                 <Button
                                                     isIconOnly
                                                     color="primary"
@@ -225,7 +244,7 @@ export default function Detail() {
                                                     label='Nombre'
                                                     variant="underlined"
                                                     isInvalid={errors.name ? true : false}
-                                                    isReadOnly={customerNoteID.length > 0}
+                                                    isReadOnly={noteID.length > 0}
                                                 />
                                             )}
                                         />
@@ -243,7 +262,7 @@ export default function Detail() {
                                                     maxRows={5}
                                                     maxLength={256}
                                                     isInvalid={errors.content ? true : false}
-                                                    isReadOnly={customerNoteID.length > 0}
+                                                    isReadOnly={noteID.length > 0}
                                                 />
                                             )}
                                         />
@@ -254,14 +273,14 @@ export default function Detail() {
                                             shadow="none"
                                             selectionMode="single"
                                             onRowAction={async (key) => {
-                                                reset(...(await getNote(param.id, key)).data);
-                                                setCustomerNoteID(key);
+                                                reset(...(await getNote(value === 'customer' ? 'customer' : 'personal', param.id, key)).data);
+                                                setNoteID(key);
                                             }}>
                                             <TableHeader>
                                                 <TableColumn></TableColumn>
                                             </TableHeader>
                                             <TableBody emptyContent={"No se encontraron notas"}>
-                                                {customerNotes.map((note) =>
+                                                {notes.map((note) =>
                                                     <TableRow key={note.id} className="cursor-pointer">
                                                         {() => <TableCell>{note.name}</TableCell>}
                                                     </TableRow>
@@ -275,7 +294,7 @@ export default function Detail() {
                     </div>
                 </div>
             </div>
-            <UserModal isOpen={isOpen} onOpenChange={onOpenChange} reloadData={loadData} />
+            <UserModal isOpen={isOpen} onOpenChange={onOpenChange} reloadData={loadData} value={value} />
         </>
     );
 }
