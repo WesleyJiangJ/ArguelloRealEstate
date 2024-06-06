@@ -21,6 +21,8 @@ export default function Main() {
             switch (section) {
                 case 'customer':
                     return titles.customer;
+                case 'personal':
+                    return titles.personal;
                 default:
                     return ''
             }
