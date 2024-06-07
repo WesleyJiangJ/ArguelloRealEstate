@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, Chip, Pagination, Select, SelectItem, useDisclosure } from "@nextui-org/react";
 import { PlusIcon, ChevronDownIcon } from '@heroicons/react/24/solid'
 import UserModal from "./UserModal";
+import SalesModal from "./SalesModal"
 
 function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
@@ -296,6 +297,9 @@ export default function Tables({ value, showStatusDropdown, showColumnsDropdown,
             </Table>
             {typeOfData === 'Usuarios' &&
                 <UserModal isOpen={isOpen} onOpenChange={onOpenChange} updateTable={updateTable} value={value} />
+            }
+            {typeOfData === 'Transacciones' &&
+                <SalesModal isOpen={isOpen} onOpenChange={onOpenChange} loadPlot={loadData} param={param} modifyURL={modifyURL} />
             }
         </>
     );
