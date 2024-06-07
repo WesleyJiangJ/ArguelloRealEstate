@@ -1,7 +1,7 @@
 import React from "react";
 import { useForm, Controller } from "react-hook-form"
 import { Button, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/react";
-import { getSpecificPlot, postPlot, putPlot, postNote, getNote, putNote } from "../../api/apiFunctions";
+import { getSpecificPlot, postPlot, putPlot, postNote, getNote, putNote, deleteNote } from "../../api/apiFunctions";
 import { sweetAlert, sweetToast } from "./Alert";
 
 export default function PlotModal({ isOpen, onOpenChange, loadPlot, param, modifyURL }) {
@@ -100,6 +100,7 @@ export default function PlotModal({ isOpen, onOpenChange, loadPlot, param, modif
                         - Checks if a note exists, if not, we create a new one.
                         - If a note exists, we update it.
                         - Check if the plot exists, if it exists, display a toast showing a message.
+                        - If note content is removed and the user saves the changes, the note record will be deleted.
                     */
                     await sweetAlert('¿Estás seguro?', `¿Deseas modificar ${change.join(', ')}?`, 'warning', 'success', 'Actualizado');
                     await putPlot(param.id, data)
@@ -116,6 +117,10 @@ export default function PlotModal({ isOpen, onOpenChange, loadPlot, param, modif
                             else {
                                 if (data.notes.content.length !== 0) {
                                     await putNote(data.notes.id, data.notes)
+                                        .catch((error) => console.log(error))
+                                }
+                                else {
+                                    await deleteNote(data.notes.id)
                                         .catch((error) => console.log(error))
                                 }
                             }
