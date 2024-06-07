@@ -59,6 +59,10 @@ export const postNote = (data) => {
     return notesAPI.post('/', data);
 }
 
+export const putNote = (id, data) => {
+    return notesAPI.put(`/${id}/`, data);
+}
+
 export const getNotes = (model, id) => {
     return notesAPI.get(`?content_type__app_label=api&content_type__model=${model}&object_id=${id}`);
 }
