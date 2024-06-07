@@ -18,3 +18,15 @@ class NotesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notes
         fields = "__all__"
+
+
+class PlotSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Plot
+        fields = "__all__"
+
+
+class SaleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Sale
+        fields = "__all__"
