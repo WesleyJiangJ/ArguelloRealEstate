@@ -24,3 +24,13 @@ class NotesViewSet(viewsets.ModelViewSet):
         "object_id": ["exact"],
         "id": ["exact"],
     }
+
+
+class PlotViewSet(viewsets.ModelViewSet):
+    queryset = Plot.objects.all()
+    serializer_class = PlotSerializer
+
+
+class SaleViewSet(viewsets.ModelViewSet):
+    queryset = Sale.objects.all()
+    serializer_class = SaleSerializer
