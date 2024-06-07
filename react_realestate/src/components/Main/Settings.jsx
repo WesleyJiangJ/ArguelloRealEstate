@@ -47,18 +47,20 @@ export default function Settings() {
     }, []);
 
     return (
-        <>
+        <div className="flex flex-col h-full">
             <Tabs
                 aria-label="Options"
                 color="primary"
                 radius="sm"
-                fullWidth>
-                <Tab key="plots" title="Lotes">
+                fullWidth
+                className="flex-grow">
+                <Tab key="plots" title="Lotes" className="flex flex-col h-full">
                     <Table
                         aria-label="Plot Table"
                         radius="sm"
                         selectionMode="single"
                         shadow="none"
+                        className="flex-grow overflow-auto"
                         onRowAction={(key) => {
                             navigate(`plot/${key}`);
                             onOpenChange(true);
@@ -82,17 +84,19 @@ export default function Settings() {
                             )}
                         </TableBody>
                     </Table>
-                    <Button
-                        className="w-full mt-2"
-                        color="primary"
-                        radius="sm"
-                        size="lg"
-                        onPress={onOpen}>
-                        Nuevo Lote
-                    </Button>
+                    <div className="sticky bottom-0 w-full">
+                        <Button
+                            className="w-full"
+                            color="primary"
+                            radius="sm"
+                            size="lg"
+                            onPress={onOpen}>
+                            Nuevo Lote
+                        </Button>
+                    </div>
                 </Tab>
             </Tabs>
             <PlotModal isOpen={isOpen} onOpenChange={onOpenChange} loadPlot={loadPlots} param={param} modifyURL={modifyURL} />
-        </>
+        </div>
     )
 }
