@@ -20,6 +20,7 @@ export default function PlotModal({ isOpen, onOpenChange, loadPlot, param, modif
         }
     });
     const [prevData, setPrevData] = React.useState({});
+    const isReadOnly = watch('status') === 1 || watch('status') === 2;
 
     React.useEffect(() => {
         loadData();
@@ -119,7 +120,7 @@ export default function PlotModal({ isOpen, onOpenChange, loadPlot, param, modif
                                     await putNote(data.notes.id, data.notes)
                                         .catch((error) => console.log(error))
                                 }
-                                else {
+                                else if (data.notes.id) {
                                     await deleteNote(data.notes.id)
                                         .catch((error) => console.log(error))
                                 }
@@ -153,6 +154,7 @@ export default function PlotModal({ isOpen, onOpenChange, loadPlot, param, modif
                         if (watch('notes.content').length > 0) {
                             if (response.status === 201) {
                                 data.notes.object_id = response.data.id;
+                                data.notes.content_type = 10;
                                 await postNote(data.notes)
                                     .then(() => {
                                         sweetToast("success", `Se agregó ${data.number}`);
@@ -212,6 +214,7 @@ export default function PlotModal({ isOpen, onOpenChange, loadPlot, param, modif
                                             autoFocus
                                             startContent={'N°'}
                                             isInvalid={errors.number ? true : false}
+                                            isReadOnly={isReadOnly ? true : false}
                                         />
                                     )}
                                 />
@@ -230,6 +233,7 @@ export default function PlotModal({ isOpen, onOpenChange, loadPlot, param, modif
                                             startContent={'$'}
                                             maxLength={11}
                                             isInvalid={errors.price ? true : false}
+                                            isReadOnly={isReadOnly ? true : false}
                                         />
                                     )}
                                 />
@@ -246,6 +250,7 @@ export default function PlotModal({ isOpen, onOpenChange, loadPlot, param, modif
                                             maxRows={3}
                                             maxLength={256}
                                             isInvalid={errors.content ? true : false}
+                                            isReadOnly={isReadOnly ? true : false}
                                         />
                                     )}
                                 />
@@ -254,7 +259,7 @@ export default function PlotModal({ isOpen, onOpenChange, loadPlot, param, modif
                                 <Button color="danger" variant="light" radius="sm" onClick={onClose}>
                                     Cerrar
                                 </Button>
-                                <Button color="primary" radius="sm" type="submit" className={watch('status') === 1 || watch('status') === 2 ? 'hidden' : 'flex'}>
+                                <Button color="primary" radius="sm" type="submit" isDisabled={isReadOnly ? true : false} className={isReadOnly ? 'hidden' : 'flex'}>
                                     Guardar
                                 </Button>
                             </ModalFooter>
