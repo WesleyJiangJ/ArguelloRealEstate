@@ -11,13 +11,15 @@ export default function SalesModal({ isOpen, onOpenChange, updateTable, reloadDa
     const [personalData, setPersonalData] = React.useState([]);
     const [plotData, setPlotData] = React.useState([]);
     const [plotPrice, setPlotPrice] = React.useState(0);
+    const [eachInstallment, setEachInstallment] = React.useState(0);
     const { control, handleSubmit, formState: { errors }, reset, watch, setValue, setError, clearErrors } = useForm({
         defaultValues: {
             id_customer: '',
             id_personal: '',
             id_plot: '',
             premium: '',
-            total: ''
+            debt: '',
+            installments: '',
         }
     });
 
@@ -42,6 +44,8 @@ export default function SalesModal({ isOpen, onOpenChange, updateTable, reloadDa
                 onOpenChange={() => {
                     onOpenChange(false);
                     reset();
+                    setPlotPrice(0);
+                    setEachInstallment(0);
                 }}
                 radius="sm"
                 size="4xl"
@@ -109,7 +113,7 @@ export default function SalesModal({ isOpen, onOpenChange, updateTable, reloadDa
                                                             field.onChange(e);
                                                             setPlotPrice(plotData.find(plot => plot.id === parseInt(e.target.value)).price);
                                                             setValue('premium', '');
-                                                            setValue('total', '');
+                                                            setValue('debt', '');
                                                         }}>
                                                         {(data) => <SelectItem description={`$${data.price}`}>{data.number}</SelectItem>}
                                                     </Select>
@@ -142,19 +146,19 @@ export default function SalesModal({ isOpen, onOpenChange, updateTable, reloadDa
                                                             field.onChange(e);
                                                             const premium = watch('premium');
                                                             if (premium.length === 0) {
-                                                                setValue('total', 0);
+                                                                setValue('debt', 0);
                                                             }
                                                             else if (premium < 0) {
                                                                 setError('premium');
-                                                                setValue('total', 0);
+                                                                setValue('debt', 0);
                                                             }
                                                             else {
                                                                 if (parseFloat(premium) > parseFloat(plotPrice)) {
                                                                     setError('premium');
-                                                                    setValue('total', 0);
+                                                                    setValue('debt', 0);
                                                                 }
                                                                 else {
-                                                                    setValue('total', parseFloat(plotPrice) - parseFloat(premium));
+                                                                    setValue('debt', parseFloat(plotPrice) - parseFloat(premium));
                                                                     clearErrors('premium');
                                                                 }
                                                             }
@@ -163,7 +167,7 @@ export default function SalesModal({ isOpen, onOpenChange, updateTable, reloadDa
                                                 )}
                                             />
                                             <Controller
-                                                name="total"
+                                                name="debt"
                                                 control={control}
                                                 render={({ field }) => (
                                                     <Input
@@ -182,6 +186,51 @@ export default function SalesModal({ isOpen, onOpenChange, updateTable, reloadDa
                                                 startContent={'$'}
                                                 isReadOnly
                                                 value={plotPrice}
+                                            />
+                                        </div>
+                                        <div className="flex flex-col md:flex-row gap-2">
+                                            <Controller
+                                                name="installments"
+                                                control={control}
+                                                rules={{
+                                                    required: true,
+                                                    validate: value => {
+                                                        if (parseInt(value) < 0) {
+                                                            return 'The installments cannot be negative';
+                                                        }
+                                                        return true;
+                                                    }
+                                                }}
+                                                render={({ field }) => (
+                                                    <Input
+                                                        {...field}
+                                                        label={'Cantidad de Cuotas'}
+                                                        variant="underlined"
+                                                        type="number"
+                                                        min={1}
+                                                        isReadOnly={watch('premium') === ''}
+                                                        isInvalid={errors.installments ? true : false}
+                                                        onChange={(e) => {
+                                                            field.onChange(e);
+                                                            if (parseInt(e.target.value) < 0) {
+                                                                setError('installments');
+                                                                setEachInstallment(0);
+                                                            }
+                                                            else {
+                                                                setEachInstallment(parseFloat(watch('debt')) / parseInt(e.target.value));
+                                                                clearErrors('installments');
+                                                            }
+                                                        }}
+                                                    />
+                                                )}
+                                            />
+                                            <Input
+                                                label={'Cuotas Mensuales'}
+                                                variant="underlined"
+                                                placeholder="0.00"
+                                                value={eachInstallment > 0 ? eachInstallment.toFixed(2) : ''}
+                                                isReadOnly
+                                                startContent={'$'}
                                             />
                                         </div>
                                     </div>
