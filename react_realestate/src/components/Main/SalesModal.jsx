@@ -19,7 +19,7 @@ export default function SalesModal({ isOpen, onOpenChange, updateTable, reloadDa
             id_plot: '',
             premium: '',
             debt: '',
-            installments: '',
+            installment: '',
         }
     });
 
@@ -114,7 +114,7 @@ export default function SalesModal({ isOpen, onOpenChange, updateTable, reloadDa
                                                             setPlotPrice(plotData.find(plot => plot.id === parseInt(e.target.value)).price);
                                                             setValue('premium', '');
                                                             setValue('debt', '');
-                                                            setValue('installments', '');
+                                                            setValue('installment', '');
                                                             setEachInstallment('');
                                                         }}>
                                                         {(data) => <SelectItem description={`$${data.price}`}>{data.number}</SelectItem>}
@@ -149,13 +149,13 @@ export default function SalesModal({ isOpen, onOpenChange, updateTable, reloadDa
                                                             const premium = watch('premium');
                                                             if (premium.length === 0) {
                                                                 setValue('debt', '');
-                                                                setValue('installments', '');
+                                                                setValue('installment', '');
                                                                 setEachInstallment('');
                                                             }
                                                             else if (premium < 0) {
                                                                 setError('premium');
                                                                 setValue('debt', '');
-                                                                setValue('installments', '');
+                                                                setValue('installment', '');
                                                                 setEachInstallment('');
                                                             }
                                                             else {
@@ -197,13 +197,13 @@ export default function SalesModal({ isOpen, onOpenChange, updateTable, reloadDa
                                         </div>
                                         <div className="flex flex-col md:flex-row gap-2">
                                             <Controller
-                                                name="installments"
+                                                name="installment"
                                                 control={control}
                                                 rules={{
                                                     required: true,
                                                     validate: value => {
                                                         if (parseInt(value) < 0) {
-                                                            return 'The installments cannot be negative';
+                                                            return 'The installment cannot be negative';
                                                         }
                                                         return true;
                                                     }
@@ -216,16 +216,16 @@ export default function SalesModal({ isOpen, onOpenChange, updateTable, reloadDa
                                                         type="number"
                                                         min={1}
                                                         isReadOnly={watch('premium') === '' || watch('premium') < 0}
-                                                        isInvalid={errors.installments ? true : false}
+                                                        isInvalid={errors.installment ? true : false}
                                                         onChange={(e) => {
                                                             field.onChange(e);
                                                             if (parseInt(e.target.value) < 0) {
-                                                                setError('installments');
+                                                                setError('installment');
                                                                 setEachInstallment('');
                                                             }
                                                             else {
                                                                 setEachInstallment(parseFloat(watch('debt')) / parseInt(e.target.value));
-                                                                clearErrors('installments');
+                                                                clearErrors('installment');
                                                             }
                                                         }}
                                                     />
