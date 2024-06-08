@@ -10,8 +10,8 @@ export default function SalesModal({ isOpen, onOpenChange, updateTable, reloadDa
     const [customerData, setCustomerData] = React.useState([]);
     const [personalData, setPersonalData] = React.useState([]);
     const [plotData, setPlotData] = React.useState([]);
-    const [plotPrice, setPlotPrice] = React.useState(0);
-    const [eachInstallment, setEachInstallment] = React.useState(0);
+    const [plotPrice, setPlotPrice] = React.useState('');
+    const [eachInstallment, setEachInstallment] = React.useState('');
     const { control, handleSubmit, formState: { errors }, reset, watch, setValue, setError, clearErrors } = useForm({
         defaultValues: {
             id_customer: '',
@@ -114,6 +114,8 @@ export default function SalesModal({ isOpen, onOpenChange, updateTable, reloadDa
                                                             setPlotPrice(plotData.find(plot => plot.id === parseInt(e.target.value)).price);
                                                             setValue('premium', '');
                                                             setValue('debt', '');
+                                                            setValue('installments', '');
+                                                            setEachInstallment('');
                                                         }}>
                                                         {(data) => <SelectItem description={`$${data.price}`}>{data.number}</SelectItem>}
                                                     </Select>
@@ -140,22 +142,26 @@ export default function SalesModal({ isOpen, onOpenChange, updateTable, reloadDa
                                                         type="number"
                                                         placeholder="0.00"
                                                         min={1}
-                                                        isReadOnly={plotPrice === 0}
+                                                        isReadOnly={plotPrice === ''}
                                                         isInvalid={errors.premium ? true : false}
                                                         onChange={(e) => {
                                                             field.onChange(e);
                                                             const premium = watch('premium');
                                                             if (premium.length === 0) {
-                                                                setValue('debt', 0);
+                                                                setValue('debt', '');
+                                                                setValue('installments', '');
+                                                                setEachInstallment('');
                                                             }
                                                             else if (premium < 0) {
                                                                 setError('premium');
-                                                                setValue('debt', 0);
+                                                                setValue('debt', '');
+                                                                setValue('installments', '');
+                                                                setEachInstallment('');
                                                             }
                                                             else {
                                                                 if (parseFloat(premium) > parseFloat(plotPrice)) {
                                                                     setError('premium');
-                                                                    setValue('debt', 0);
+                                                                    setValue('debt', '');
                                                                 }
                                                                 else {
                                                                     setValue('debt', parseFloat(plotPrice) - parseFloat(premium));
@@ -184,6 +190,7 @@ export default function SalesModal({ isOpen, onOpenChange, updateTable, reloadDa
                                                 label={'Precio del Lote'}
                                                 variant="underlined"
                                                 startContent={'$'}
+                                                placeholder="0.00"
                                                 isReadOnly
                                                 value={plotPrice}
                                             />
@@ -208,13 +215,13 @@ export default function SalesModal({ isOpen, onOpenChange, updateTable, reloadDa
                                                         variant="underlined"
                                                         type="number"
                                                         min={1}
-                                                        isReadOnly={watch('premium') === ''}
+                                                        isReadOnly={watch('premium') === '' || watch('premium') < 0}
                                                         isInvalid={errors.installments ? true : false}
                                                         onChange={(e) => {
                                                             field.onChange(e);
                                                             if (parseInt(e.target.value) < 0) {
                                                                 setError('installments');
-                                                                setEachInstallment(0);
+                                                                setEachInstallment('');
                                                             }
                                                             else {
                                                                 setEachInstallment(parseFloat(watch('debt')) / parseInt(e.target.value));
