@@ -20,6 +20,10 @@ const plotAPI = axios.create({
     baseURL: 'http://localhost:8000/plot/'
 })
 
+const salesAPI = axios.create({
+    baseURL: 'http://localhost:8000/sale/'
+})
+
 // Customer
 export const getAllCustomers = () => {
     return customerAPI.get('/');
@@ -90,4 +94,13 @@ export const putPlot = (id, data) => {
 
 export const postPlot = (data) => {
     return plotAPI.post('/', data);
+}
+
+// Sales
+export const getAllSales = () => {
+    return salesAPI.get('/');
+}
+
+export const postSale = (data) => {
+    return salesAPI.post('/', data);
 }
