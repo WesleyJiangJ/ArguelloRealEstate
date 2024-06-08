@@ -195,6 +195,7 @@ export default function PlotModal({ isOpen, onOpenChange, loadPlot, param, modif
             }}
             radius="sm"
             backdrop="blur"
+            placement="center"
             isDismissable={false}>
             <ModalContent>
                 {(onClose) => (
