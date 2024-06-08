@@ -71,9 +71,10 @@ class Sale(models.Model):
     id_plot = models.ForeignKey(Plot, on_delete=models.CASCADE)
     premium = models.DecimalField(max_digits=10, decimal_places=2)
     installment = models.PositiveIntegerField()
-    total_paid = models.DecimalField(max_digits=10, decimal_places=2)
+    total_paid = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     status = models.CharField(max_length=1, choices=STATUS_CHOICES, default=0)
-    created_at = models.DateField()
+    modified_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Plot {self.id_plot} sold to {self.id_customer} - {self.status}"
