@@ -2,8 +2,8 @@ import React from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Autocomplete, AutocompleteItem, Select, SelectItem } from "@nextui-org/react";
 import { useForm, Controller } from "react-hook-form"
 import { useParams } from "react-router-dom";
-import { getAllCustomers, getAllPersonal, getAllPlots } from "../../api/apiFunctions";
-import { sweetAlert, sweetToast } from "./Alert";
+import { getAllCustomers, getAllPersonal, getAllPlots, getSpecificPlot, putPlot, postSale } from "../../api/apiFunctions";
+import { sweetAlert } from "./Alert";
 
 export default function SalesModal({ isOpen, onOpenChange, updateTable, reloadData }) {
     const param = useParams();
@@ -34,7 +34,19 @@ export default function SalesModal({ isOpen, onOpenChange, updateTable, reloadDa
     }
 
     const onSubmit = async (data) => {
-        console.log(data);
+        await sweetAlert('¿Crear esta venta?', 'Una vez creada, no podrás modificarla', 'question', 'success', 'Hecho');
+        const plotRes = (await getSpecificPlot(data.id_plot)).data;
+        await postSale(data)
+            .then(async () => {
+                plotRes.status = 1;
+                await putPlot(data.id_plot, plotRes)
+                    .catch(error => console.log(error));
+                updateTable();
+                onOpenChange(false);
+            })
+            .catch((error) => {
+                console.log(error);
+            })
     }
 
     return (
@@ -145,26 +157,31 @@ export default function SalesModal({ isOpen, onOpenChange, updateTable, reloadDa
                                                         isReadOnly={plotPrice === ''}
                                                         isInvalid={errors.premium ? true : false}
                                                         onChange={(e) => {
-                                                            field.onChange(e);
-                                                            const premium = watch('premium');
-                                                            if (premium.length === 0) {
+                                                            const value = e.target.value;
+                                                            field.onChange(value);
+                                                            if (value !== '') {
                                                                 setValue('debt', '');
                                                                 setValue('installment', '');
                                                                 setEachInstallment('');
                                                             }
-                                                            else if (premium < 0) {
+                                                            if (value.length === 0) {
+                                                                setValue('debt', '');
+                                                                setValue('installment', '');
+                                                                setEachInstallment('');
+                                                            }
+                                                            else if (value < 0) {
                                                                 setError('premium');
                                                                 setValue('debt', '');
                                                                 setValue('installment', '');
                                                                 setEachInstallment('');
                                                             }
                                                             else {
-                                                                if (parseFloat(premium) > parseFloat(plotPrice)) {
+                                                                if (parseFloat(value) > parseFloat(plotPrice)) {
                                                                     setError('premium');
                                                                     setValue('debt', '');
                                                                 }
                                                                 else {
-                                                                    setValue('debt', parseFloat(plotPrice) - parseFloat(premium));
+                                                                    setValue('debt', parseFloat(plotPrice) - parseFloat(value));
                                                                     clearErrors('premium');
                                                                 }
                                                             }
