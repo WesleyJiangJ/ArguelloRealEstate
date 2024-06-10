@@ -1,49 +1,49 @@
 import React from "react";
 import Table from "./Table";
-// import { getAllSales } from "../../api/apiFunctions";
+import { getAllSales } from "../../api/apiFunctions";
 
 export default function Sales() {
     const [salesData, setSalesData] = React.useState([]);
-    const INITIAL_VISIBLE_COLUMNS = ["full_name", "status"];
+    const INITIAL_VISIBLE_COLUMNS = ["full_name", "plot", "status"];
     const columns = [
-        { name: "Nombres", uid: "full_name", sortable: true },
-        { name: "Celular", uid: "phone_number", sortable: true },
+        { name: "Nombres", uid: "full_name", sortable: false },
+        { name: "Lote", uid: "plot", sortable: false },
         { name: "Estado", uid: "status", sortable: false },
     ];
     const statusColorMap = {
-        true: "success",
-        false: "danger",
+        0: "danger",
+        1: "success",
     };
     const statusOptions = [
-        { name: "Activo", uid: true },
-        { name: "Inactivo", uid: false },
+        { name: "Proceso", uid: true },
+        { name: "Vendido", uid: false },
     ];
     const cellValues = [
         {
             firstColumn: "full_name",
-            firstValue: "`${item.first_name} ${item.middle_name} ${item.first_surname} ${item.second_surname}`",
-            secondValue: "`${item.email}`"
+            firstValue: "`${item.customer_data.first_name} ${item.customer_data.middle_name} ${item.customer_data.first_surname} ${item.customer_data.second_surname}`",
+            secondValue: "``"
         },
         {
-            secondColum: "phone_number",
-            firstValue: "`${item.phone_number}`"
+            secondColumn: "plot",
+            firstValue: "`${item.plot_data.number}`"
         },
         {
             thirdColumn: "status",
-            firstValue: "`${item.status}`",
+            firstValue: "`${item.status === 0 ? true : item.status === 2 ? false : ''}`",
             secondValue: {
-                first: 'Activo',
-                second: 'Inactivo'
+                first: 'Vendido',
+                second: 'Proceso'
             }
         }
     ];
     const sortedItem = {
-        first: "`${a.first_name} ${a.middle_name} ${a.first_lastname} ${a.second_lastname}`",
-        second: "`${b.first_name} ${b.middle_name} ${b.first_lastname} ${b.second_lastname}`"
+        first: "`${a.customer_data.first_name}`",
+        second: "`${b.customer_data.first_name}`"
     }
     const fetchData = async () => {
         try {
-            // setSalesData((await getAllSales()).data);
+            setSalesData((await getAllSales()).data);
         } catch (error) {
             console.error("Error fetching data:", error);
         }
