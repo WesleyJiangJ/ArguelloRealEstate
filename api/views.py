@@ -34,3 +34,8 @@ class PlotViewSet(viewsets.ModelViewSet):
 class SaleViewSet(viewsets.ModelViewSet):
     queryset = Sale.objects.all()
     serializer_class = SaleSerializer
+
+
+class InstallmentViewSet(viewsets.ModelViewSet):
+    queryset = Installment.objects.all()
+    serializer_class = InstallmentSerializer
