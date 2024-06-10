@@ -101,6 +101,10 @@ export const getAllSales = () => {
     return salesAPI.get('/');
 }
 
+export const getSpecificSale = (id) => {
+    return salesAPI.get(`/${id}`);
+}
+
 export const postSale = (data) => {
     return salesAPI.post('/', data);
 }
