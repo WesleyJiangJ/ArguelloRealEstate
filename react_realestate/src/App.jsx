@@ -6,6 +6,7 @@ import Customer from './components/Main/Customer';
 import Detail from './components/Main/Detail';
 import Personal from './components/Main/Personal';
 import Sales from './components/Main/Sales';
+import SalesDetail from './components/Main/SalesDetail';
 import Settings from './components/Main/Settings';
 import PlotModal from './components/Main/PlotModal'
 
@@ -28,6 +29,7 @@ function App() {
             <Route path='personal/*' element={<Personal />} />
             <Route path='personal/detail/:id' element={<Detail value={"Personal"} />} />
             <Route path='sales/*' element={<Sales />} />
+            <Route path='sales/detail/:id' element={<SalesDetail />} />
             <Route path='settings/*' element={<Settings />}>
               <Route path='plot/:id' element={<PlotModal />} />
             </Route>
