@@ -40,3 +40,9 @@ class SaleSerializer(serializers.ModelSerializer):
         representation["personal_data"] = personal_representation
         representation["plot_data"] = plot_representation
         return representation
+
+
+class InstallmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Installment
+        fields = "__all__"
