@@ -65,7 +65,7 @@ class Plot(models.Model):
 
 
 class Sale(models.Model):
-    STATUS_CHOICES = [(0, "Active"), (1, "Cancelled"), (2, "Completed")]
+    STATUS_CHOICES = [(0, "Active"), (1, "Completed"), (2, "Cancelled")]
     id_customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     id_personal = models.ForeignKey(Personal, on_delete=models.CASCADE)
     id_plot = models.ForeignKey(Plot, on_delete=models.CASCADE)
