@@ -26,7 +26,7 @@ class Customer(models.Model):
     dni = models.CharField(max_length=16, validators=[MinLengthValidator(16)])
     phone_number = models.CharField(max_length=8)
     email = models.EmailField(max_length=255, blank=True)
-    notes = GenericRelation(Notes)
+    note = GenericRelation(Notes)
     status = models.BooleanField(default=True)
     modified_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -44,7 +44,7 @@ class Personal(models.Model):
     dni = models.CharField(max_length=16, validators=[MinLengthValidator(16)])
     phone_number = models.CharField(max_length=8)
     email = models.EmailField(max_length=255, blank=True)
-    notes = GenericRelation(Notes)
+    note = GenericRelation(Notes)
     status = models.BooleanField(default=True)
     modified_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -57,7 +57,7 @@ class Plot(models.Model):
     STATUS_CHOICES = [(0, "Available"), (1, "Process"), (2, "Sold")]
     number = models.CharField(max_length=10, unique=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    notes = GenericRelation(Notes)
+    note = GenericRelation(Notes)
     status = models.CharField(max_length=1, choices=STATUS_CHOICES, default=0)
 
     def __str__(self):
@@ -70,7 +70,7 @@ class Sale(models.Model):
     id_personal = models.ForeignKey(Personal, on_delete=models.CASCADE)
     id_plot = models.ForeignKey(Plot, on_delete=models.CASCADE)
     premium = models.DecimalField(max_digits=10, decimal_places=2)
-    installment = models.PositiveIntegerField()
+    installments = models.PositiveIntegerField()
     total_paid = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     status = models.CharField(max_length=1, choices=STATUS_CHOICES, default=0)
     modified_at = models.DateTimeField(auto_now_add=True)
@@ -78,3 +78,15 @@ class Sale(models.Model):
 
     def __str__(self):
         return f"Plot {self.id_plot} sold to {self.id_customer} - {self.status}"
+
+
+class Installment(models.Model):
+    TYPE_CHOICES = [(0, "Premium"), (1, "Installment")]
+    id_sale = models.ForeignKey(Sale, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    payment_type = models.CharField(max_length=1, choices=TYPE_CHOICES)
+    note = GenericRelation(Notes)
+    created_at = models.DateField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.id_sale}"
