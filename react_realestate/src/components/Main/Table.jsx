@@ -299,7 +299,7 @@ export default function Tables({ value, showStatusDropdown, showColumnsDropdown,
                 <UserModal isOpen={isOpen} onOpenChange={onOpenChange} updateTable={updateTable} value={value} />
             }
             {typeOfData === 'Transacciones' &&
-                <SalesModal isOpen={isOpen} onOpenChange={onOpenChange} loadPlot={loadData} param={param} modifyURL={modifyURL} />
+                <SalesModal isOpen={isOpen} onOpenChange={onOpenChange} updateTable={updateTable} param={param} modifyURL={modifyURL} />
             }
         </>
     );
