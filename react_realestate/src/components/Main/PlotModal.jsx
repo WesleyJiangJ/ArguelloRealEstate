@@ -125,7 +125,7 @@ export default function PlotModal({ isOpen, onOpenChange, loadPlot, param, modif
                                         .catch((error) => console.log(error))
                                 }
                             }
-                            sweetToast("success", `Se actualizó ${data.number}`);
+                            sweetToast("success", `Se actualizó el lote N°${data.number}`);
                             restore();
                         })
                         .catch((error) => {
@@ -157,7 +157,7 @@ export default function PlotModal({ isOpen, onOpenChange, loadPlot, param, modif
                                 data.notes.content_type = 10;
                                 await postNote(data.notes)
                                     .then(() => {
-                                        sweetToast("success", `Se agregó ${data.number}`);
+                                        sweetToast("success", `Se agregó el lote N°${data.number}`);
                                         restore();
                                     })
                                     .catch((error) => console.error('Error:', error));
@@ -166,7 +166,7 @@ export default function PlotModal({ isOpen, onOpenChange, loadPlot, param, modif
                             }
                         }
                         else {
-                            sweetToast("success", `Se agregó ${data.number}`);
+                            sweetToast("success", `Se agregó el lote N°${data.number}`);
                             restore();
                         }
                     })
