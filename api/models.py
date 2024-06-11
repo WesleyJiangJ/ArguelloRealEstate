@@ -86,6 +86,7 @@ class Installment(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     payment_type = models.CharField(max_length=1, choices=TYPE_CHOICES)
     note = GenericRelation(Notes)
+    date = models.DateField()
     created_at = models.DateField(auto_now=True)
 
     def __str__(self):
