@@ -198,7 +198,7 @@ export default function Detail({ value }) {
                                                                 .then(() => {
                                                                     loadData();
                                                                     reset({ name: '', content: '', object_id: parseInt(param.id), content_type: value === 'customer' ? 7 : 9 });
-                                                                    setUserData('');
+                                                                    setNoteID('');
                                                                 })
                                                                 .catch((error) => {
                                                                     console.error('Error: ', error);
@@ -273,7 +273,7 @@ export default function Detail({ value }) {
                                             shadow="none"
                                             selectionMode="single"
                                             onRowAction={async (key) => {
-                                                reset(...(await getNote(value === 'customer' ? 'customer' : 'personal', param.id, key)).data);
+                                                reset(...(await getNote(value === 'Clientes' ? 'customer' : 'personal', param.id, key)).data);
                                                 setNoteID(key);
                                             }}>
                                             <TableHeader>
