@@ -24,6 +24,10 @@ const salesAPI = axios.create({
     baseURL: 'http://localhost:8000/sale/'
 })
 
+const installmentAPI = axios.create({
+    baseURL: 'http://localhost:8000/installment/'
+})
+
 // Customer
 export const getAllCustomers = () => {
     return customerAPI.get('/');
@@ -107,4 +111,13 @@ export const getSpecificSale = (id) => {
 
 export const postSale = (data) => {
     return salesAPI.post('/', data);
+}
+
+// Installment
+export const getAllInstallmentByCustomer = (id) => {
+    return installmentAPI.get(`?id_sale__id_customer=${id}`);
+}
+
+export const postInstallment = (data) => {
+    return installmentAPI.post('/', data);
 }
