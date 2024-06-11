@@ -39,3 +39,5 @@ class SaleViewSet(viewsets.ModelViewSet):
 class InstallmentViewSet(viewsets.ModelViewSet):
     queryset = Installment.objects.all()
     serializer_class = InstallmentSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['id_sale__id_customer']
