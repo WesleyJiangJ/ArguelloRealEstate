@@ -11,6 +11,7 @@ export default function SalesDetail() {
     const param = useParams();
     const [saleData, setSaleData] = React.useState([]);
     const [installmentData, setInstallmentData] = React.useState([]);
+    const [totalPaid, setTotalPaid] = React.useState(0);
     const [notes, setNotes] = React.useState([]);
     const [noteID, setNoteID] = React.useState('');
     const { control, handleSubmit, formState: { errors }, reset, setError, clearErrors } = useForm({
@@ -41,13 +42,19 @@ export default function SalesDetail() {
             const saleData = saleResponse.data;
             setSaleData(saleData);
             const id_customer = saleData.customer_data?.id;
+            const id_sale = saleData.id;
 
 
             setNotes((await getNotes('sale', param.id)).data);
 
-            if (id_customer) {
-                const installmentResponse = await getAllInstallmentByCustomer(id_customer);
+            if (id_customer && id_sale) {
+                const installmentResponse = await getAllInstallmentByCustomer(id_customer, id_sale);
                 setInstallmentData(installmentResponse.data);
+                let totalPaid = 0;
+                installmentResponse.data.forEach(element => {
+                    totalPaid += parseFloat(element.amount);
+                });
+                setTotalPaid(totalPaid);
             }
         } catch (error) {
             console.error("Error loading data:", error);
@@ -154,7 +161,7 @@ export default function SalesDetail() {
                                                 isReadOnly
                                                 label="Valor del Lote"
                                                 startContent={'$'}
-                                                value={String(saleData.plot_data?.price)}
+                                                value={`${parseFloat(saleData.plot_data?.price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                             />
                                         </div>
                                         <div className="flex flex-col md:flex-row gap-2">
@@ -167,9 +174,31 @@ export default function SalesDetail() {
                                             <Input
                                                 variant="underlined"
                                                 isReadOnly
+                                                label="Cuotas Abonadas"
+                                                value={installmentData.length > 1 ? String(installmentData.length - 1) : 0}
+                                            />
+                                            <Input
+                                                variant="underlined"
+                                                isReadOnly
                                                 label="Cuotas Mensuales"
                                                 startContent={'$'}
                                                 value={String(((saleData.plot_data?.price - saleData?.premium) / saleData?.installments).toFixed(2))}
+                                            />
+                                        </div>
+                                        <div className="flex flex-col md:flex-row gap-2">
+                                            <Input
+                                                variant="underlined"
+                                                isReadOnly
+                                                label="Abonado"
+                                                startContent={'$'}
+                                                value={`${totalPaid.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                                            />
+                                            <Input
+                                                variant="underlined"
+                                                isReadOnly
+                                                label="Restante"
+                                                startContent={'$'}
+                                                value={`${(saleData.plot_data?.price - totalPaid).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                             />
                                         </div>
                                     </div>
