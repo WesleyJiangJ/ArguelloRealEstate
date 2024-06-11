@@ -114,8 +114,8 @@ export const postSale = (data) => {
 }
 
 // Installment
-export const getAllInstallmentByCustomer = (id) => {
-    return installmentAPI.get(`?id_sale__id_customer=${id}`);
+export const getAllInstallmentByCustomer = (id_customer, id_sale) => {
+    return installmentAPI.get(`?id_sale__id_customer=${id_customer}&id_sale=${id_sale}`);
 }
 
 export const postInstallment = (data) => {
