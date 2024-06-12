@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { Sidebar, Menu, MenuItem } from 'react-pro-sidebar';
-import { HomeModernIcon, UserIcon, BanknotesIcon, UserGroupIcon, CogIcon, ArrowLeftStartOnRectangleIcon } from "@heroicons/react/24/solid";
+import { HomeModernIcon, UserIcon, BanknotesIcon, UserGroupIcon, CogIcon, ArrowLeftStartOnRectangleIcon, Squares2X2Icon } from "@heroicons/react/24/solid";
 
 export default function SideBar({ collapsed }) {
     const menuItemStyles = {
@@ -29,6 +29,11 @@ export default function SideBar({ collapsed }) {
                         icon={<UserIcon className="h-5 w-5" />}
                         component={<NavLink to="customer" style={getActiveStyles} />}>
                         Clientes
+                    </MenuItem>
+                    <MenuItem
+                        icon={<Squares2X2Icon className="h-5 w-5" />}
+                        component={<NavLink to="plot" style={getActiveStyles} />}>
+                        Lotes
                     </MenuItem>
                     <MenuItem
                         icon={<BanknotesIcon className="h-5 w-5" />}
