@@ -4,6 +4,7 @@ import Login from "./pages/Login";
 import Main from './pages/Main';
 import Customer from './components/Main/Customer';
 import Detail from './components/Main/Detail';
+import Plot from './components/Main/Plot';
 import Personal from './components/Main/Personal';
 import Sales from './components/Main/Sales';
 import SalesDetail from './components/Main/SalesDetail';
@@ -14,6 +15,7 @@ function App() {
   const mainData = {
     titles: {
       customer: 'Clientes',
+      plot: 'Lotes',
       personal: 'Personal',
       sales: 'Ventas'
     },
@@ -26,13 +28,14 @@ function App() {
           <Route path='/main/*' element={<Main />}>
             <Route path='customer/*' element={<Customer />} />
             <Route path='customer/detail/:id' element={<Detail value={"Clientes"} />} />
+            <Route path='plot/*' element={<Plot />}>
+              <Route path='detail/:id' element={<PlotModal />} />
+            </Route>
             <Route path='personal/*' element={<Personal />} />
             <Route path='personal/detail/:id' element={<Detail value={"Personal"} />} />
             <Route path='sales/*' element={<Sales />} />
             <Route path='sales/detail/:id' element={<SalesDetail />} />
-            <Route path='settings/*' element={<Settings />}>
-              <Route path='plot/:id' element={<PlotModal />} />
-            </Route>
+            <Route path='settings/*' element={<Settings />} />
           </Route>
         </Routes>
       </MainContext.Provider>
