@@ -43,7 +43,7 @@ export default function Sales() {
     }
     const fetchData = async () => {
         try {
-            setSalesData((await getAllSales()).data);
+            setSalesData((await getAllSales()).data.filter((data) => data.status === 0 || data.status === 1));
         } catch (error) {
             console.error("Error fetching data:", error);
         }
