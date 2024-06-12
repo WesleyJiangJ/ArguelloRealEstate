@@ -2,7 +2,7 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form"
 import { Card, CardHeader, CardBody, Button, Input, Textarea, DatePicker, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@nextui-org/react";
-import { getAllInstallmentByCustomer, getNote, getNotes, getSpecificSale, postInstallment, postNote, deleteNote } from "../../api/apiFunctions"
+import { getAllInstallmentByCustomer, getNote, getNotes, getSpecificSale, postInstallment, postNote, deleteNote, patchSale } from "../../api/apiFunctions"
 import { today } from "@internationalized/date";
 import { ChatBubbleOvalLeftEllipsisIcon, PlusIcon, ArrowPathIcon, TrashIcon } from "@heroicons/react/24/outline"
 import { sweetAlert, sweetToast } from "./Alert";
@@ -14,7 +14,7 @@ export default function SalesDetail() {
     const [totalPaid, setTotalPaid] = React.useState(0);
     const [notes, setNotes] = React.useState([]);
     const [noteID, setNoteID] = React.useState('');
-    const { control, handleSubmit, formState: { errors }, reset, setError, clearErrors } = useForm({
+    const { control, handleSubmit, formState: { errors }, reset, watch, setError, clearErrors } = useForm({
         defaultValues: {
             id_sale: parseInt(param.id),
             amount: '',
@@ -22,7 +22,7 @@ export default function SalesDetail() {
             date: today()
         }
     });
-    const { control: controlNote, handleSubmit: handleSubmitNote, formState: { errors: errorsNote }, reset: resetNote, setError: setErrorNote, clearErrors: clearErrorNote } = useForm({
+    const { control: controlNote, handleSubmit: handleSubmitNote, formState: { errors: errorsNote }, reset: resetNote } = useForm({
         defaultValues: {
             id: '',
             name: '',
@@ -40,11 +40,10 @@ export default function SalesDetail() {
         try {
             const saleResponse = await getSpecificSale(param.id);
             const saleData = saleResponse.data;
-            setSaleData(saleData);
             const id_customer = saleData.customer_data?.id;
             const id_sale = saleData.id;
-
-
+            
+            setSaleData(saleData);
             setNotes((await getNotes('sale', param.id)).data);
 
             if (id_customer && id_sale) {
@@ -62,15 +61,20 @@ export default function SalesDetail() {
     };
 
     const onSubmit = async (data) => {
+        data.date = data.date.year + '-' + String(data.date.month).padStart(2, '0') + '-' + String(data.date.day).padStart(2, '0');
+        const updateData = {
+            total_paid: (parseFloat(totalPaid) + parseFloat(watch('amount'))).toFixed(2)
+        };
         if (installmentData.length === 0) {
             data.payment_type = 0;
         }
         else {
             data.payment_type = 1;
+            updateData.date_paid = data.date;
         }
-        data.date = data.date.year + '-' + String(data.date.month).padStart(2, '0') + '-' + String(data.date.day).padStart(2, '0');
         await postInstallment(data)
-            .then(() => {
+            .then(async () => {
+                await patchSale(param.id, updateData)
                 sweetToast("success", `Se abonaron $${data.amount}`);
                 reset();
                 loadData();
@@ -280,7 +284,6 @@ export default function SalesDetail() {
                                                             onChange={(e) => {
                                                                 field.onChange(e);
                                                                 if (installmentData.length === 0) {
-                                                                    console.log("first")
                                                                     if (parseFloat(e.target.value) > parseFloat(saleData.premium)) {
                                                                         setError('amount');
                                                                     }
