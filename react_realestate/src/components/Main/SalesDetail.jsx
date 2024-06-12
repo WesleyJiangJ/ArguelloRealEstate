@@ -2,7 +2,7 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form"
 import { Card, CardHeader, CardBody, Button, Input, Textarea, DatePicker, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@nextui-org/react";
-import { getAllInstallmentByCustomer, getNote, getNotes, getSpecificSale, postInstallment, postNote, deleteNote, patchSale } from "../../api/apiFunctions"
+import { getAllInstallmentByCustomer, getNote, getNotes, getSpecificSale, postInstallment, postNote, deleteNote, patchSale, patchPlot } from "../../api/apiFunctions"
 import { today } from "@internationalized/date";
 import { ChatBubbleOvalLeftEllipsisIcon, PlusIcon, ArrowPathIcon, TrashIcon } from "@heroicons/react/24/outline"
 import { sweetAlert, sweetToast } from "./Alert";
@@ -42,7 +42,7 @@ export default function SalesDetail() {
             const saleData = saleResponse.data;
             const id_customer = saleData.customer_data?.id;
             const id_sale = saleData.id;
-            
+
             setSaleData(saleData);
             setNotes((await getNotes('sale', param.id)).data);
 
@@ -71,10 +71,17 @@ export default function SalesDetail() {
         else {
             data.payment_type = 1;
             updateData.date_paid = data.date;
+            if ((parseFloat(totalPaid) + parseFloat(watch('amount'))).toFixed(2) === parseFloat(saleData.plot_data?.price).toFixed(2)) {
+                updateData.status = 1;
+            }
         }
+        await sweetAlert(`¿Deseas agregar $${data.amount}?`, `En concepto de ${installmentData.length === 0 ? 'prima' : 'cuota'}`, 'question', 'success', 'Hecho');
         await postInstallment(data)
             .then(async () => {
                 await patchSale(param.id, updateData)
+                if (updateData.status === 1) {
+                    await patchPlot(saleData.id_plot, { status: 2 })
+                }
                 sweetToast("success", `Se abonaron $${data.amount}`);
                 reset();
                 loadData();
@@ -115,6 +122,16 @@ export default function SalesDetail() {
                 return cellValue;
         }
     }, []);
+
+    const cancelSale = async () => {
+        await sweetAlert('¿Deseas anular la venta?', 'Esta acción es irreversible', 'question', 'success', 'Hecho');
+        await patchSale(param.id, { status: 2 })
+            .then(async () => {
+                await patchPlot(saleData.id_plot, { status: 0 })
+                reset();
+                loadData();
+            });
+    }
 
     return (
         <>
@@ -230,13 +247,16 @@ export default function SalesDetail() {
                                         startContent={<ChatBubbleOvalLeftEllipsisIcon className="w-5 h-5" />}>
                                         Enviar Mensaje
                                     </Button>
-                                    <Button
-                                        color={'danger'}
-                                        radius="sm"
-                                        variant="light"
-                                        className="h-16 m:h-full lg:h-full">
-                                        Anular Venta
-                                    </Button>
+                                    {saleData.status === 0 &&
+                                        <Button
+                                            color={'danger'}
+                                            radius="sm"
+                                            variant="light"
+                                            className="h-16 m:h-full lg:h-full"
+                                            onClick={() => cancelSale()}>
+                                            Anular Venta
+                                        </Button>
+                                    }
                                 </CardBody>
                             </Card>
                         </div>
@@ -251,73 +271,85 @@ export default function SalesDetail() {
                                     <CardHeader>
                                         <div className="flex flex-col w-full">
                                             <h4 className="font-bold text-medium">Detalle de Cuotas</h4>
-                                            <div className="flex flex-col md:flex-row gap-2 items-center">
-                                                <Controller
-                                                    name="amount"
-                                                    control={control}
-                                                    rules={{
-                                                        required: true,
-                                                        pattern: {
-                                                            value: /^\d+(\.\d{1,2})?$/
-                                                        },
-                                                        validate: value => {
-                                                            if (installmentData.length === 0) {
-                                                                if (parseFloat(value) > parseFloat(saleData.premium)) {
-                                                                    console.log("first")
-                                                                    return 'The amount cannot be higher than the premium field';
+                                            {saleData.status === 0 &&
+                                                <div className="flex flex-col md:flex-row gap-2 items-center">
+                                                    <Controller
+                                                        name="amount"
+                                                        control={control}
+                                                        rules={{
+                                                            required: true,
+                                                            pattern: {
+                                                                value: /^\d+(\.\d{1,2})?$/
+                                                            },
+                                                            validate: value => {
+                                                                if (installmentData.length === 0) {
+                                                                    if (parseFloat(value) > parseFloat(saleData.premium)) {
+                                                                        return 'The amount cannot be higher than the premium field';
+                                                                    }
+                                                                }
+                                                                else if (parseFloat(value) > parseFloat(saleData.plot_data?.price - totalPaid)) {
+                                                                    return 'The amount cannot be higher than the debt';
+                                                                }
+                                                                else {
+                                                                    return true;
                                                                 }
                                                             }
-                                                            else {
-                                                                return true;
-                                                            }
-                                                        }
-                                                    }}
-                                                    render={({ field }) => (
-                                                        <Input
-                                                            {...field}
-                                                            label="Abono"
-                                                            variant="underlined"
-                                                            startContent={'$'}
-                                                            placeholder="0.00"
-                                                            min={1}
-                                                            isInvalid={errors.amount ? true : false}
-                                                            onChange={(e) => {
-                                                                field.onChange(e);
-                                                                if (installmentData.length === 0) {
-                                                                    if (parseFloat(e.target.value) > parseFloat(saleData.premium)) {
-                                                                        setError('amount');
+                                                        }}
+                                                        render={({ field }) => (
+                                                            <Input
+                                                                {...field}
+                                                                label="Abono"
+                                                                variant="underlined"
+                                                                startContent={'$'}
+                                                                placeholder="0.00"
+                                                                min={1}
+                                                                isInvalid={errors.amount ? true : false}
+                                                                onChange={(e) => {
+                                                                    field.onChange(e);
+                                                                    if (installmentData.length === 0) {
+                                                                        if (parseFloat(e.target.value) > parseFloat(saleData.premium)) {
+                                                                            setError('amount');
+                                                                        }
+                                                                        else {
+                                                                            clearErrors('amount');
+                                                                        }
                                                                     }
                                                                     else {
-                                                                        clearErrors('amount');
+                                                                        if (parseFloat(e.target.value) > parseFloat(saleData.plot_data?.price - totalPaid)) {
+                                                                            setError('amount');
+                                                                        }
+                                                                        else {
+                                                                            clearErrors('amount');
+                                                                        }
                                                                     }
-                                                                }
-                                                            }}
-                                                        />
-                                                    )}
-                                                />
-                                                <Controller
-                                                    name="date"
-                                                    control={control}
-                                                    rules={{ required: true }}
-                                                    render={({ field }) => (
-                                                        <DatePicker
-                                                            {...field}
-                                                            label='Fecha'
-                                                            variant="underlined"
-                                                            showMonthAndYearPickers
-                                                            isInvalid={errors.date ? true : false}
-                                                        />
-                                                    )}
-                                                />
-                                                <Button
-                                                    color="primary"
-                                                    radius="sm"
-                                                    className="w-full md:w-auto"
-                                                    isIconOnly
-                                                    type="submit">
-                                                    <PlusIcon className="w-5 h-5" />
-                                                </Button>
-                                            </div>
+                                                                }}
+                                                            />
+                                                        )}
+                                                    />
+                                                    <Controller
+                                                        name="date"
+                                                        control={control}
+                                                        rules={{ required: true }}
+                                                        render={({ field }) => (
+                                                            <DatePicker
+                                                                {...field}
+                                                                label='Fecha'
+                                                                variant="underlined"
+                                                                showMonthAndYearPickers
+                                                                isInvalid={errors.date ? true : false}
+                                                            />
+                                                        )}
+                                                    />
+                                                    <Button
+                                                        color="primary"
+                                                        radius="sm"
+                                                        className="w-full md:w-auto"
+                                                        isIconOnly
+                                                        type="submit">
+                                                        <PlusIcon className="w-5 h-5" />
+                                                    </Button>
+                                                </div>
+                                            }
                                         </div>
                                     </CardHeader>
                                 </form>
