@@ -1,7 +1,7 @@
 import React from "react";
 import { useForm, Controller } from "react-hook-form"
 import { Button, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/react";
-import { getSpecificPlot, postPlot, putPlot, postNote, getNote, putNote, deleteNote } from "../../api/apiFunctions";
+import { getSpecificPlot, postPlot, patchPlot, postNote, getNote, putNote, deleteNote } from "../../api/apiFunctions";
 import { sweetAlert, sweetToast } from "./Alert";
 
 export default function PlotModal({ isOpen, onOpenChange, loadPlot, param, modifyURL }) {
@@ -104,7 +104,7 @@ export default function PlotModal({ isOpen, onOpenChange, loadPlot, param, modif
                         - If note content is removed and the user saves the changes, the note record will be deleted.
                     */
                     await sweetAlert('¿Estás seguro?', `¿Deseas modificar ${change.join(', ')}?`, 'warning', 'success', 'Actualizado');
-                    await putPlot(param.id, data)
+                    await patchPlot(param.id, data)
                         .then(async () => {
                             const res = (await getNote('plot', param.id, '')).data;
                             if (res.length === 0 && data.notes.content.length !== 0) {
