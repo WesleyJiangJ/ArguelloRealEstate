@@ -72,6 +72,7 @@ class Sale(models.Model):
     premium = models.DecimalField(max_digits=10, decimal_places=2)
     installments = models.PositiveIntegerField()
     total_paid = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    date_paid = models.DateField(blank=True, null=True)
     status = models.CharField(max_length=1, choices=STATUS_CHOICES, default=0)
     modified_at = models.DateTimeField(auto_now_add=True)
     created_at = models.DateTimeField(auto_now_add=True)
