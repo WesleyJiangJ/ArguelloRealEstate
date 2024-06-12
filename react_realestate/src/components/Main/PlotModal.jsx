@@ -201,7 +201,7 @@ export default function PlotModal({ isOpen, onOpenChange, loadPlot, param, modif
                 {(onClose) => (
                     <>
                         <form onSubmit={handleSubmit(onSubmit)}>
-                            <ModalHeader className="flex flex-col gap-1">{param.id ? 'Modificar' : 'Nuevo'} Lote</ModalHeader>
+                            <ModalHeader className="flex flex-col gap-1">{watch('status') === 1 || watch('status') === 2 ? 'Detalle' : `${param.id ? 'Modificar' : 'Nuevo'} Lote`}</ModalHeader>
                             <ModalBody>
                                 <Controller
                                     name="number"
