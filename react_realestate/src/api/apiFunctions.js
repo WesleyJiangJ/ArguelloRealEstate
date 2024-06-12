@@ -92,8 +92,8 @@ export const getSpecificPlot = (id) => {
     return plotAPI.get(`/${id}`);
 }
 
-export const putPlot = (id, data) => {
-    return plotAPI.put(`/${id}/`, data);
+export const patchPlot = (id, data) => {
+    return plotAPI.patch(`/${id}/`, data);
 }
 
 export const postPlot = (data) => {
