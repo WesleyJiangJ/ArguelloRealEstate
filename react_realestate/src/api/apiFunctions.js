@@ -109,6 +109,10 @@ export const getSpecificSale = (id) => {
     return salesAPI.get(`/${id}`);
 }
 
+export const patchSale = (id, data) => {
+    return salesAPI.patch(`/${id}/`, data);
+}
+
 export const postSale = (data) => {
     return salesAPI.post('/', data);
 }
