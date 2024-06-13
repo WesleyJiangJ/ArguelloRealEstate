@@ -34,6 +34,8 @@ class PlotViewSet(viewsets.ModelViewSet):
 class SaleViewSet(viewsets.ModelViewSet):
     queryset = Sale.objects.all()
     serializer_class = SaleSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["id_customer", "id_personal"]
 
 
 class InstallmentViewSet(viewsets.ModelViewSet):
