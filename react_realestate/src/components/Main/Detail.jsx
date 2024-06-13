@@ -1,11 +1,12 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form"
-import { Card, CardHeader, CardBody, Button, Input, Textarea, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, useDisclosure } from "@nextui-org/react";
-import { getSpecificCustomer, putCustomer, postNote, getNotes, getNote, deleteNote, getSpecificPersonal, putPersonal } from "../../api/apiFunctions"
+import { Card, CardHeader, CardBody, Button, Input, Textarea, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Tab, Tabs, useDisclosure } from "@nextui-org/react";
+import { getSpecificCustomer, putCustomer, postNote, getNotes, getNote, deleteNote, getSpecificPersonal, putPersonal, getSaleByUser } from "../../api/apiFunctions"
 import { ChatBubbleOvalLeftEllipsisIcon, PlusIcon, ArrowPathIcon, TrashIcon } from "@heroicons/react/24/outline"
 import { sweetAlert, sweetToast } from "./Alert";
 import UserModal from "./UserModal"
+import Cards from "./Cards";
 
 export default function Detail({ value }) {
     const param = useParams();
@@ -13,6 +14,7 @@ export default function Detail({ value }) {
     const [userData, setUserData] = React.useState([]);
     const [notes, setNotes] = React.useState([]);
     const [noteID, setNoteID] = React.useState('');
+    const [sale, setSale] = React.useState([]);
     const { control, handleSubmit, formState: { errors }, reset, setValue } = useForm({
         defaultValues: {
             name: '',
@@ -30,11 +32,13 @@ export default function Detail({ value }) {
         if (value === "Clientes") {
             setUserData((await getSpecificCustomer(param.id)).data);
             setNotes((await getNotes('customer', param.id)).data);
+            setSale((await getSaleByUser(param.id, '')).data);
             setValue('content_type', 7);
         }
         else {
             setUserData((await getSpecificPersonal(param.id)).data);
             setNotes((await getNotes('personal', param.id)).data);
+            setSale((await getSaleByUser('', param.id)).data);
             setValue('content_type', 9);
         }
     }
@@ -163,16 +167,144 @@ export default function Detail({ value }) {
                             </Card>
                         </div>
                     </div>
-                    <div className="flex flex-col md:flex-row gap-2 flex-grow">
+                    <div className="flex flex-col md:flex-row gap-2 h-2/3">
                         <div className="w-full flex-grow">
                             <Card
                                 radius="sm"
                                 className="bg-card h-full"
                                 shadow="none">
                                 <CardHeader>
-                                    <h4 className="font-bold text-medium"></h4>
+                                    <h4 className="font-bold text-medium">Detalle Ventas</h4>
                                 </CardHeader>
-                                <CardBody></CardBody>
+                                <CardBody>
+                                    <Tabs aria-label="Details" color="primary" fullWidth>
+                                        <Tab
+                                            key="process"
+                                            title={
+                                                <div className="flex items-center space-x-2">
+                                                    <span>Proceso</span>
+                                                    <div className="w-5 h-5 flex items-center justify-center rounded-full border">
+                                                        <span>{sale.filter((info) => info.status === 0).length}</span>
+                                                    </div>
+                                                </div>
+                                            }>
+                                            <Card
+                                                radius="sm"
+                                                shadow="none"
+                                                className="h-full">
+                                                <CardBody>
+                                                    <div className='flex flex-nowrap flex-col md:flex-wrap md:flex-row w-full h-full overflow-scroll'>
+                                                        {sale
+                                                            .filter(info => info.status === 0)
+                                                            .sort((a, b) => new Date(a.modified_at) - new Date(b.modified_at))
+                                                            .map((data) => (
+                                                                <div className="w-full md:w-1/2" key={data.id}>
+                                                                    <Cards
+                                                                        id={data.id}
+                                                                        plot={`Lote ${data.plot_data.number}`}
+                                                                        name={value === 'Clientes' ? `${data.personal_data.first_name} ${data.personal_data.middle_name} ${data.personal_data.first_surname} ${data.personal_data.second_surname}` : `${data.customer_data.first_name} ${data.customer_data.middle_name} ${data.customer_data.first_surname} ${data.customer_data.second_surname}`}
+                                                                        plotPrice={`Precio: $${parseFloat(data.plot_data.price).toLocaleString()}`}
+                                                                        pending={`Pendiente: $${(parseFloat(data.plot_data.price) - parseFloat(data.total_paid)).toLocaleString()}`}
+                                                                        paid={`Abonado: $${parseFloat(data.total_paid).toLocaleString()}`}
+                                                                    />
+                                                                </div>
+                                                            ))
+                                                        }
+                                                        {sale.filter(info => info.status === 0).length === 0 && (
+                                                            <Card radius="sm" shadow="none" fullWidth>
+                                                                <CardBody className="flex items-center justify-center h-full">
+                                                                    No se encontraron lotes en proceso de venta
+                                                                </CardBody>
+                                                            </Card>
+                                                        )}
+                                                    </div>
+                                                </CardBody>
+                                            </Card>
+                                        </Tab>
+                                        <Tab
+                                            key="sold"
+                                            title={<div className="flex items-center space-x-2">
+                                                <span>Vendidos</span>
+                                                <div className="w-5 h-5 flex items-center justify-center rounded-full border">
+                                                    <span>{sale.filter((info) => info.status === 1).length}</span>
+                                                </div>
+                                            </div>}>
+                                            <Card
+                                                radius="sm"
+                                                shadow="none"
+                                                className="h-full">
+                                                <CardBody>
+                                                    <div className='flex flex-nowrap flex-col md:flex-wrap md:flex-row w-full h-full overflow-scroll'>
+                                                        {sale
+                                                            .filter(info => info.status === 1)
+                                                            .sort((a, b) => new Date(a.modified_at) - new Date(b.modified_at))
+                                                            .map((data) => (
+                                                                <div className="w-full md:w-1/2" key={data.id}>
+                                                                    <Cards
+                                                                        id={data.id}
+                                                                        plot={`Lote ${data.plot_data.number}`}
+                                                                        name={value === 'Clientes' ? `${data.personal_data.first_name} ${data.personal_data.middle_name} ${data.personal_data.first_surname} ${data.personal_data.second_surname}` : `${data.customer_data.first_name} ${data.customer_data.middle_name} ${data.customer_data.first_surname} ${data.customer_data.second_surname}`}
+                                                                        plotPrice={`Precio: $${parseFloat(data.plot_data.price).toLocaleString()}`}
+                                                                    />
+                                                                </div>
+                                                            ))
+                                                        }
+                                                        {sale.filter(info => info.status === 1).length === 0 && (
+                                                            <Card radius="sm" shadow="none" fullWidth>
+                                                                <CardBody className="flex items-center justify-center h-full">
+                                                                    No se encontraron lotes vendidos
+                                                                </CardBody>
+                                                            </Card>
+                                                        )}
+                                                    </div>
+                                                </CardBody>
+                                            </Card>
+                                        </Tab>
+                                        <Tab
+                                            key="cancelled"
+                                            title={
+                                                <div className="flex items-center space-x-2">
+                                                    <span>Anulados</span>
+                                                    <div className="w-5 h-5 flex items-center justify-center rounded-full border">
+                                                        <span>{sale.filter((info) => info.status === 2).length}</span>
+                                                    </div>
+                                                </div>
+                                            }>
+                                            <Card
+                                                radius="sm"
+                                                shadow="none"
+                                                className="h-full">
+                                                <CardBody>
+                                                    <div className='flex flex-nowrap flex-col md:flex-wrap md:flex-row w-full h-full overflow-scroll'>
+                                                        {sale
+                                                            .filter(info => info.status === 2)
+                                                            .sort((a, b) => new Date(a.modified_at) - new Date(b.modified_at))
+                                                            .map((data) => (
+                                                                <div className="w-full md:w-1/2" key={data.id}>
+                                                                    <Cards
+                                                                        id={data.id}
+                                                                        plot={`Lote ${data.plot_data.number}`}
+                                                                        name={value === 'Clientes' ? `${data.personal_data.first_name} ${data.personal_data.middle_name} ${data.personal_data.first_surname} ${data.personal_data.second_surname}` : `${data.customer_data.first_name} ${data.customer_data.middle_name} ${data.customer_data.first_surname} ${data.customer_data.second_surname}`}
+                                                                        plotPrice={`Precio: $${parseFloat(data.plot_data.price).toLocaleString()}`}
+                                                                        pending={`Pendiente: $${(parseFloat(data.plot_data.price) - parseFloat(data.total_paid)).toLocaleString()}`}
+                                                                        paid={`Abonado: $${parseFloat(data.total_paid).toLocaleString()}`}
+                                                                    />
+                                                                </div>
+                                                            ))
+                                                        }
+                                                        {sale.filter(info => info.status === 2).length === 0 && (
+                                                            <Card radius="sm" shadow="none" fullWidth>
+                                                                <CardBody className="flex items-center justify-center h-full">
+                                                                    No se encontraron lotes con venta anulada
+                                                                </CardBody>
+                                                            </Card>
+                                                        )}
+                                                    </div>
+                                                </CardBody>
+                                            </Card>
+                                        </Tab>
+                                    </Tabs>
+                                </CardBody>
                             </Card>
                         </div>
                         <div className="w-full md:w-5/12 flex-grow">
