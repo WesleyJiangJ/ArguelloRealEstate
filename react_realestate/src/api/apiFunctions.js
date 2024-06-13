@@ -37,8 +37,8 @@ export const getSpecificCustomer = (id) => {
     return customerAPI.get(`/${id}`);
 }
 
-export const putCustomer = (id, data) => {
-    return customerAPI.put(`/${id}/`, data);
+export const patchCustomer = (id, data) => {
+    return customerAPI.patch(`/${id}/`, data);
 }
 
 export const postCustomer = (data) => {
@@ -54,8 +54,8 @@ export const getSpecificPersonal = (id) => {
     return personalAPI.get(`/${id}`);
 }
 
-export const putPersonal = (id, data) => {
-    return personalAPI.put(`/${id}/`, data);
+export const patchPersonal = (id, data) => {
+    return personalAPI.patch(`/${id}/`, data);
 }
 
 export const postPersonal = (data) => {
