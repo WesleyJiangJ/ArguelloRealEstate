@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import Logo from '../../assets/images/logo.jpg'
+import Login from '../../assets/images/login.jpg'
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Link } from "@nextui-org/react";
 import { UserIcon, LockClosedIcon } from '@heroicons/react/24/outline'
 
@@ -62,7 +62,7 @@ export default function LoginModal({ isOpen, onOpenChange }) {
                                 <div className="hidden lg:inline">
                                     <img
                                         className="w-full h-full object-cover"
-                                        src={Logo}
+                                        src={Login}
                                         alt="Login Image"
                                     />
                                 </div>
