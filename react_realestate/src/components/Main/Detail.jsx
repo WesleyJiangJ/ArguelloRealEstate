@@ -2,7 +2,7 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form"
 import { Card, CardHeader, CardBody, Button, Input, Textarea, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Tab, Tabs, useDisclosure } from "@nextui-org/react";
-import { getSpecificCustomer, putCustomer, postNote, getNotes, getNote, deleteNote, getSpecificPersonal, putPersonal, getSaleByUser } from "../../api/apiFunctions"
+import { getSpecificCustomer, patchCustomer, postNote, getNotes, getNote, deleteNote, getSpecificPersonal, patchPersonal, getSaleByUser } from "../../api/apiFunctions"
 import { ChatBubbleOvalLeftEllipsisIcon, PlusIcon, ArrowPathIcon, TrashIcon } from "@heroicons/react/24/outline"
 import { sweetAlert, sweetToast } from "./Alert";
 import UserModal from "./UserModal"
@@ -44,27 +44,35 @@ export default function Detail({ value }) {
     }
 
     const disableUser = async () => {
-        if (userData.status) userData.status = false
-        else userData.status = true
+        const update_data = {}
+        if (userData.status) update_data.status = false
+        else update_data.status = true
 
-        await sweetAlert(`¿Desea dar de ${userData.status ? "alta" : "baja"} al ${value === 'Clientes' ? 'cliente' : 'personal'}?`, '', "warning", "success", "Hecho");
-        if (value === 'Clientes') {
-            await putCustomer(param.id, userData)
-                .then(() => {
-                    loadData();
-                })
-                .catch((error) => {
-                    console.error('Error: ', error);
-                })
+        if (sale.filter(info => info.status === 0).length > 0) {
+            sweetToast('error', `No puede dar de baja al ${value === 'Cliente' ? 'cliente' : 'personal'} porque tiene ventas activas`)
         }
         else {
-            await putPersonal(param.id, userData)
-                .then(() => {
-                    loadData();
-                })
-                .catch((error) => {
-                    console.error('Error: ', error);
-                })
+            await sweetAlert(`¿Desea dar de ${update_data.status ? "alta" : "baja"} al ${value === 'Clientes' ? 'cliente' : 'personal'}?`, '', "warning", "success", "Hecho");
+            if (value === 'Clientes') {
+                if (sale.filter(data => data.status === 0)) {
+                    await patchCustomer(param.id, update_data)
+                        .then(() => {
+                            loadData();
+                        })
+                        .catch((error) => {
+                            console.error('Error: ', error);
+                        })
+                }
+            }
+            else {
+                await patchPersonal(param.id, update_data)
+                    .then(() => {
+                        loadData();
+                    })
+                    .catch((error) => {
+                        console.error('Error: ', error);
+                    })
+            }
         }
     }
 
