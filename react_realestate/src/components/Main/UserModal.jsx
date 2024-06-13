@@ -3,7 +3,7 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input
 import { useForm, Controller } from "react-hook-form"
 import { useParams } from "react-router-dom";
 import { getLocalTimeZone, today, parseDate } from "@internationalized/date";
-import { getSpecificCustomer, getSpecificPersonal, postCustomer, postPersonal, putCustomer, putPersonal } from "../../api/apiFunctions";
+import { getSpecificCustomer, getSpecificPersonal, postCustomer, postPersonal, patchCustomer, patchPersonal } from "../../api/apiFunctions";
 import { sweetAlert, sweetToast } from "./Alert";
 
 export default function UserModal({ isOpen, onOpenChange, updateTable, reloadData, value }) {
@@ -99,7 +99,7 @@ export default function UserModal({ isOpen, onOpenChange, updateTable, reloadDat
             if (changes.size > 0) {
                 await sweetAlert("¿Confirmar cambios?", `¿Deseas modificar ${Array.from(changes).join(', ')}?`, "warning", "success", "Datos Actualizados");
                 if (value === 'Clientes') {
-                    await putCustomer(param.id, data)
+                    await patchCustomer(param.id, data)
                         .then(() => {
                             reloadData();
                             loadData();
@@ -111,7 +111,7 @@ export default function UserModal({ isOpen, onOpenChange, updateTable, reloadDat
                         })
                 }
                 else {
-                    await putPersonal(param.id, data)
+                    await patchPersonal(param.id, data)
                         .then(() => {
                             reloadData();
                             loadData();
