@@ -215,7 +215,7 @@ export default function PlotModal({ isOpen, onOpenChange, loadPlot, param, modif
                                             autoFocus
                                             startContent={'N°'}
                                             isInvalid={errors.number ? true : false}
-                                            isReadOnly={isReadOnly ? true : false}
+                                            isReadOnly={isReadOnly ? true : false || watch('number').length === 0 ? false : true}
                                         />
                                     )}
                                 />
