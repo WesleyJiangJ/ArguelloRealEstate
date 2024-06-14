@@ -263,7 +263,7 @@ export default function Tables({ value, showStatusDropdown, showColumnsDropdown,
                 isHeaderSticky
                 bottomContent={bottomContent}
                 bottomContentPlacement="outside"
-                classNames={{ wrapper: "h-[66vh]" }}
+                className="h-full"
                 selectedKeys={selectedKeys}
                 sortDescriptor={sortDescriptor}
                 topContent={topContent}
