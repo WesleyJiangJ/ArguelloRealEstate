@@ -1,12 +1,13 @@
 import React from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Autocomplete, AutocompleteItem, Select, SelectItem } from "@nextui-org/react";
 import { useForm, Controller } from "react-hook-form"
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { getAllCustomers, getAllPersonal, getAllPlots, patchPlot, postSale } from "../../api/apiFunctions";
 import { sweetAlert } from "./Alert";
 
 export default function SalesModal({ isOpen, onOpenChange, updateTable }) {
     const param = useParams();
+    const navigate = useNavigate();
     const [customerData, setCustomerData] = React.useState([]);
     const [personalData, setPersonalData] = React.useState([]);
     const [plotData, setPlotData] = React.useState([]);
@@ -36,11 +37,12 @@ export default function SalesModal({ isOpen, onOpenChange, updateTable }) {
     const onSubmit = async (data) => {
         await sweetAlert('¿Crear esta venta?', 'Una vez creada, no podrás modificarla', 'question', 'success', 'Hecho');
         await postSale(data)
-            .then(async () => {
+            .then(async (response) => {
                 await patchPlot(data.id_plot, { status: 1 })
                     .catch(error => console.log(error));
                 updateTable();
                 onOpenChange(false);
+                navigate(`detail/${response.data.id}`);
             })
             .catch((error) => {
                 console.log(error);
