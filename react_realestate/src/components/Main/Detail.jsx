@@ -211,8 +211,8 @@ export default function Detail({ value }) {
                                                                         id={data.id}
                                                                         plot={`Lote ${data.plot_data.number}`}
                                                                         name={value === 'Clientes' ? `${data.personal_data.first_name} ${data.personal_data.middle_name} ${data.personal_data.first_surname} ${data.personal_data.second_surname}` : `${data.customer_data.first_name} ${data.customer_data.middle_name} ${data.customer_data.first_surname} ${data.customer_data.second_surname}`}
-                                                                        plotPrice={`Precio: $${parseFloat(data.plot_data.price).toLocaleString()}`}
-                                                                        pending={`Pendiente: $${(parseFloat(data.plot_data.price) - parseFloat(data.total_paid)).toLocaleString()}`}
+                                                                        plotPrice={`Precio: $${parseFloat(data.price).toLocaleString()}`}
+                                                                        pending={`Pendiente: $${(parseFloat(data.price) - parseFloat(data.total_paid)).toLocaleString()}`}
                                                                         paid={`Abonado: $${parseFloat(data.total_paid).toLocaleString()}`}
                                                                     />
                                                                 </div>
@@ -252,7 +252,7 @@ export default function Detail({ value }) {
                                                                         id={data.id}
                                                                         plot={`Lote ${data.plot_data.number}`}
                                                                         name={value === 'Clientes' ? `${data.personal_data.first_name} ${data.personal_data.middle_name} ${data.personal_data.first_surname} ${data.personal_data.second_surname}` : `${data.customer_data.first_name} ${data.customer_data.middle_name} ${data.customer_data.first_surname} ${data.customer_data.second_surname}`}
-                                                                        plotPrice={`Precio: $${parseFloat(data.plot_data.price).toLocaleString()}`}
+                                                                        plotPrice={`Precio: $${parseFloat(data.price).toLocaleString()}`}
                                                                     />
                                                                 </div>
                                                             ))
@@ -293,8 +293,8 @@ export default function Detail({ value }) {
                                                                         id={data.id}
                                                                         plot={`Lote ${data.plot_data.number}`}
                                                                         name={value === 'Clientes' ? `${data.personal_data.first_name} ${data.personal_data.middle_name} ${data.personal_data.first_surname} ${data.personal_data.second_surname}` : `${data.customer_data.first_name} ${data.customer_data.middle_name} ${data.customer_data.first_surname} ${data.customer_data.second_surname}`}
-                                                                        plotPrice={`Precio: $${parseFloat(data.plot_data.price).toLocaleString()}`}
-                                                                        pending={`Pendiente: $${(parseFloat(data.plot_data.price) - parseFloat(data.total_paid)).toLocaleString()}`}
+                                                                        plotPrice={`Precio: $${parseFloat(data.price).toLocaleString()}`}
+                                                                        pending={`Pendiente: $${(parseFloat(data.price) - parseFloat(data.total_paid)).toLocaleString()}`}
                                                                         paid={`Abonado: $${parseFloat(data.total_paid).toLocaleString()}`}
                                                                     />
                                                                 </div>

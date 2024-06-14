@@ -183,7 +183,7 @@ export default function SalesDetail() {
                                                 isReadOnly
                                                 label="Valor del Lote"
                                                 startContent={'$'}
-                                                value={`${parseFloat(saleData.plot_data?.price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                                                value={`${parseFloat(saleData.price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                             />
                                         </div>
                                         <div className="flex flex-col md:flex-row gap-2">

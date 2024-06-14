@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams } from "react-router-dom";
 import { getAllInstallmentByCustomer, getSpecificSale } from "../../api/apiFunctions"
-import { Page, Text, View, Document, Image, StyleSheet, PDFViewer, PDFDownloadLink } from '@react-pdf/renderer';
+import { Page, Text, View, Document, Image, StyleSheet, PDFViewer } from '@react-pdf/renderer';
 import Logo from '../../assets/images/logo.png';
 import Stamp from '../../assets/images/stamp.png';
 import Tigo from '../../assets/images/tigo.png';
@@ -121,7 +121,7 @@ export default function PDF() {
                                 Cuotas pagadas
                             </Text>
                             <Text style={[styles.text]}>
-                                {installment.length === 1 ? 0 : installment.length - 1}
+                                {installment.length === 0 ? 0 : installment.length === 1 ? 0 : installment.length - 1}
                             </Text>
                         </View>
 
@@ -130,7 +130,7 @@ export default function PDF() {
                                 Precio del lote
                             </Text>
                             <Text style={[styles.text]}>
-                                {`$${parseFloat(data.plot_data?.price).toLocaleString()}`}
+                                {`$${parseFloat(data.price).toLocaleString()}`}
                             </Text>
                         </View>
 
@@ -148,7 +148,7 @@ export default function PDF() {
                                 Pendiente
                             </Text>
                             <Text style={[styles.text]}>
-                                {`$${(parseFloat(data.plot_data?.price) - parseFloat(data.total_paid)).toLocaleString()}`}
+                                {`$${(parseFloat(data.price) - parseFloat(data.total_paid)).toLocaleString()}`}
                             </Text>
                         </View>
 
