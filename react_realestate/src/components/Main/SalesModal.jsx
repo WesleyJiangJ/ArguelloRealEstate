@@ -2,21 +2,21 @@ import React from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Autocomplete, AutocompleteItem, Select, SelectItem } from "@nextui-org/react";
 import { useForm, Controller } from "react-hook-form"
 import { useParams } from "react-router-dom";
-import { getAllCustomers, getAllPersonal, getAllPlots, getSpecificPlot, patchPlot, postSale } from "../../api/apiFunctions";
+import { getAllCustomers, getAllPersonal, getAllPlots, patchPlot, postSale } from "../../api/apiFunctions";
 import { sweetAlert } from "./Alert";
 
-export default function SalesModal({ isOpen, onOpenChange, updateTable, reloadData }) {
+export default function SalesModal({ isOpen, onOpenChange, updateTable }) {
     const param = useParams();
     const [customerData, setCustomerData] = React.useState([]);
     const [personalData, setPersonalData] = React.useState([]);
     const [plotData, setPlotData] = React.useState([]);
-    const [plotPrice, setPlotPrice] = React.useState('');
     const [eachInstallment, setEachInstallment] = React.useState('');
     const { control, handleSubmit, formState: { errors }, reset, watch, setValue, setError, clearErrors } = useForm({
         defaultValues: {
             id_customer: '',
             id_personal: '',
             id_plot: '',
+            price: '',
             premium: '',
             debt: '',
             installments: '',
@@ -28,8 +28,8 @@ export default function SalesModal({ isOpen, onOpenChange, updateTable, reloadDa
     }, []);
 
     const loadData = async () => {
-        setCustomerData((await getAllCustomers()).data);
-        setPersonalData((await getAllPersonal()).data);
+        setCustomerData((await getAllCustomers()).data.filter((data) => data.status === true));
+        setPersonalData((await getAllPersonal()).data.filter((data) => data.status === true));
         setPlotData((await getAllPlots()).data.filter((plot) => plot.status === 0));
     }
 
@@ -54,7 +54,6 @@ export default function SalesModal({ isOpen, onOpenChange, updateTable, reloadDa
                 onOpenChange={() => {
                     onOpenChange(false);
                     reset();
-                    setPlotPrice(0);
                     setEachInstallment(0);
                 }}
                 radius="sm"
@@ -121,7 +120,7 @@ export default function SalesModal({ isOpen, onOpenChange, updateTable, reloadDa
                                                         isInvalid={errors.id_plot ? true : false}
                                                         onChange={(e) => {
                                                             field.onChange(e);
-                                                            setPlotPrice(plotData.find(plot => plot.id === parseInt(e.target.value)).price);
+                                                            setValue('price', plotData.find(plot => plot.id === parseInt(e.target.value)).price);
                                                             setValue('premium', '');
                                                             setValue('debt', '');
                                                             setValue('installments', '');
@@ -137,7 +136,7 @@ export default function SalesModal({ isOpen, onOpenChange, updateTable, reloadDa
                                                 rules={{
                                                     required: true,
                                                     validate: value => {
-                                                        if (parseFloat(value) > parseFloat(plotPrice)) {
+                                                        if (parseFloat(value) > parseFloat(watch('price'))) {
                                                             return 'The premium cannot be higher than the price of the plot';
                                                         }
                                                         return true;
@@ -152,7 +151,7 @@ export default function SalesModal({ isOpen, onOpenChange, updateTable, reloadDa
                                                         type="number"
                                                         placeholder="0.00"
                                                         min={1}
-                                                        isReadOnly={plotPrice === ''}
+                                                        isReadOnly={watch('price') === ''}
                                                         isInvalid={errors.premium ? true : false}
                                                         onChange={(e) => {
                                                             const value = e.target.value;
@@ -174,12 +173,12 @@ export default function SalesModal({ isOpen, onOpenChange, updateTable, reloadDa
                                                                 setEachInstallment('');
                                                             }
                                                             else {
-                                                                if (parseFloat(value) > parseFloat(plotPrice)) {
+                                                                if (parseFloat(value) > parseFloat(watch('price'))) {
                                                                     setError('premium');
                                                                     setValue('debt', '');
                                                                 }
                                                                 else {
-                                                                    setValue('debt', parseFloat(plotPrice) - parseFloat(value));
+                                                                    setValue('debt', parseFloat(watch('price')) - parseFloat(value));
                                                                     clearErrors('premium');
                                                                 }
                                                             }
@@ -207,7 +206,7 @@ export default function SalesModal({ isOpen, onOpenChange, updateTable, reloadDa
                                                 startContent={'$'}
                                                 placeholder="0.00"
                                                 isReadOnly
-                                                value={plotPrice}
+                                                value={watch('price')}
                                             />
                                         </div>
                                         <div className="flex flex-col md:flex-row gap-2">
@@ -250,7 +249,7 @@ export default function SalesModal({ isOpen, onOpenChange, updateTable, reloadDa
                                                 label={'Cuotas Mensuales'}
                                                 variant="underlined"
                                                 placeholder="0.00"
-                                                value={eachInstallment > 0 ? eachInstallment.toFixed(2) : ''}
+                                                value={eachInstallment > 0 ? parseFloat(eachInstallment).toFixed(2) : ''}
                                                 isReadOnly
                                                 startContent={'$'}
                                             />
