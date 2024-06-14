@@ -69,6 +69,7 @@ class Sale(models.Model):
     id_customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     id_personal = models.ForeignKey(Personal, on_delete=models.CASCADE)
     id_plot = models.ForeignKey(Plot, on_delete=models.CASCADE)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
     premium = models.DecimalField(max_digits=10, decimal_places=2)
     installments = models.PositiveIntegerField()
     total_paid = models.DecimalField(max_digits=10, decimal_places=2, default=0)
