@@ -288,6 +288,9 @@ export default function SalesDetail() {
                                                                     if (parseFloat(value) > parseFloat(saleData.premium)) {
                                                                         return 'The amount cannot be higher than the premium field';
                                                                     }
+                                                                    else if (parseFloat(value) < parseFloat(saleData.premium)) {
+                                                                        return 'The amount cannot be lower than the premium field';
+                                                                    }
                                                                 }
                                                                 else if (parseFloat(value) > parseFloat(saleData.plot_data?.price - totalPaid)) {
                                                                     return 'The amount cannot be higher than the debt';
@@ -310,6 +313,9 @@ export default function SalesDetail() {
                                                                     field.onChange(e);
                                                                     if (installmentData.length === 0) {
                                                                         if (parseFloat(e.target.value) > parseFloat(saleData.premium)) {
+                                                                            setError('amount');
+                                                                        }
+                                                                        else if (parseFloat(e.target.value) < parseFloat(saleData.premium)) {
                                                                             setError('amount');
                                                                         }
                                                                         else {
