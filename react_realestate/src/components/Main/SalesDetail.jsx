@@ -1,5 +1,5 @@
 import React from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form"
 import { Card, CardHeader, CardBody, Button, Input, Textarea, DatePicker, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@nextui-org/react";
 import { getAllInstallmentByCustomer, getNote, getNotes, getSpecificSale, postInstallment, postNote, deleteNote, patchSale, patchPlot } from "../../api/apiFunctions"
@@ -9,6 +9,7 @@ import { sweetAlert, sweetToast } from "./Alert";
 
 export default function SalesDetail() {
     const param = useParams();
+    const navigate = useNavigate();
     const [saleData, setSaleData] = React.useState([]);
     const [installmentData, setInstallmentData] = React.useState([]);
     const [totalPaid, setTotalPaid] = React.useState(0);
@@ -235,7 +236,8 @@ export default function SalesDetail() {
                                     <Button
                                         color="primary"
                                         radius="sm"
-                                        className="h-16 m:h-full lg:h-full">
+                                        className="h-16 m:h-full lg:h-full"
+                                        onClick={() => navigate(`/main/sales/detail/${saleData.id}/invoice`)}>
                                         Generar Factura
                                     </Button>
                                     <Button
