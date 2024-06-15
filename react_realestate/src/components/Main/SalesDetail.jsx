@@ -220,7 +220,7 @@ export default function SalesDetail() {
                                                 isReadOnly
                                                 label="Restante"
                                                 startContent={'$'}
-                                                value={`${(saleData.plot_data?.price - totalPaid).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                                                value={`${(saleData.price - totalPaid).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                             />
                                         </div>
                                     </div>
