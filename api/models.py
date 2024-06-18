@@ -64,6 +64,12 @@ class Plot(models.Model):
         return f"{self.number} - {self.status}"
 
 
+class Commission(models.Model):
+    id_personal = models.ForeignKey(Personal, on_delete=models.CASCADE)
+    id_plot = models.ForeignKey(Plot, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+
+
 class Sale(models.Model):
     STATUS_CHOICES = [(0, "Active"), (1, "Completed"), (2, "Cancelled")]
     id_customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
