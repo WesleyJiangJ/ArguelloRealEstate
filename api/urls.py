@@ -10,6 +10,7 @@ router.register(r"notes", views.NotesViewSet)
 router.register(r"plot", views.PlotViewSet)
 router.register(r"sale", views.SaleViewSet)
 router.register(r"installment", views.InstallmentViewSet)
+router.register(r"commission", views.CommissionViewSet)
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
