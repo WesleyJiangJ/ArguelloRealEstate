@@ -46,3 +46,15 @@ class InstallmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Installment
         fields = "__all__"
+
+
+class CommissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Commission
+        fields = "__all__"
+
+    def to_representation(self, instance):
+        representation = super(CommissionSerializer, self).to_representation(instance)
+        plot_representation = PlotSerializer(instance.id_plot).data
+        representation["plot_data"] = plot_representation
+        return representation
