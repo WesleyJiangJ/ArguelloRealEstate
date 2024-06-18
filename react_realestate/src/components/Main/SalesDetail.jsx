@@ -2,7 +2,7 @@ import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form"
 import { Card, CardHeader, CardBody, Button, Input, Textarea, DatePicker, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@nextui-org/react";
-import { getAllInstallmentByCustomer, getNote, getNotes, getSpecificSale, postInstallment, postNote, deleteNote, patchSale, patchPlot } from "../../api/apiFunctions"
+import { getAllInstallmentByCustomer, getNote, getNotes, getSpecificSale, postInstallment, postNote, deleteNote, patchSale, patchPlot, postComission } from "../../api/apiFunctions"
 import { today } from "@internationalized/date";
 import { ChatBubbleOvalLeftEllipsisIcon, PlusIcon, ArrowPathIcon, TrashIcon } from "@heroicons/react/24/outline"
 import { sweetAlert, sweetToast } from "./Alert";
@@ -81,7 +81,8 @@ export default function SalesDetail() {
             .then(async () => {
                 await patchSale(param.id, updateData)
                 if (updateData.status === 1) {
-                    await patchPlot(saleData.id_plot, { status: 2 })
+                    await patchPlot(saleData.id_plot, { status: 2 });
+                    await postComission({id_personal: saleData.id_personal, id_plot: saleData.id_plot, amount: (parseFloat(saleData.price) * 0.05)});
                 }
                 sweetToast("success", `Se abonaron $${data.amount}`);
                 reset();
