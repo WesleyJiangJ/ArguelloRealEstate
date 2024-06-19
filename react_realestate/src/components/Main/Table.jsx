@@ -91,8 +91,13 @@ export default function Tables({ value, showStatusDropdown, showColumnsDropdown,
     }, [sortDescriptor, items]);
 
     const formatDate = (dateString) => {
-        const [year, month, day] = dateString.split('-');
-        return `${day}/${month}/${year}`;
+        if (dateString) {
+            const [year, month, day] = dateString.split('-');
+            return `${day}/${month}/${year}`;
+        }
+        else {
+            return 'No realizada'
+        }
     };
 
     const renderCell = React.useCallback((item, columnKey) => {
