@@ -135,10 +135,10 @@ export const postInstallment = (data) => {
 }
 
 // Commission
-export const postComission = (data) => {
+export const postCommission = (data) => {
     return commissionAPI.post('/', data);
 }
 
-export const getComissionByUser = (id_personal) => {
+export const getCommissionByUser = (id_personal) => {
     return commissionAPI.get(`?id_personal=${id_personal}`);
 }

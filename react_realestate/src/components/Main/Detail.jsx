@@ -2,7 +2,7 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form"
 import { Card, CardHeader, CardBody, Button, Input, Textarea, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Tab, Tabs, useDisclosure } from "@nextui-org/react";
-import { getSpecificCustomer, patchCustomer, postNote, getNotes, getNote, deleteNote, getSpecificPersonal, patchPersonal, getSaleByUser, getComissionByUser } from "../../api/apiFunctions"
+import { getSpecificCustomer, patchCustomer, postNote, getNotes, getNote, deleteNote, getSpecificPersonal, patchPersonal, getSaleByUser, getCommissionByUser } from "../../api/apiFunctions"
 import { ChatBubbleOvalLeftEllipsisIcon, PlusIcon, ArrowPathIcon, TrashIcon } from "@heroicons/react/24/outline"
 import { sweetAlert, sweetToast } from "./Alert";
 import UserModal from "./UserModal"
@@ -15,8 +15,8 @@ export default function Detail({ value }) {
     const [notes, setNotes] = React.useState([]);
     const [noteID, setNoteID] = React.useState('');
     const [sale, setSale] = React.useState([]);
-    const [comission, setComission] = React.useState([]);
-    const [totalComission, setTotalComission] = React.useState(0);
+    const [commission, setCommission] = React.useState([]);
+    const [totalCommission, setTotalCommission] = React.useState(0);
     const { control, handleSubmit, formState: { errors }, reset, setValue } = useForm({
         defaultValues: {
             name: '',
@@ -41,9 +41,9 @@ export default function Detail({ value }) {
             setUserData((await getSpecificPersonal(param.id)).data);
             setNotes((await getNotes('personal', param.id)).data);
             setSale((await getSaleByUser('', param.id)).data);
-            const comissions = (await getComissionByUser(param.id)).data;
-            setComission(comissions);
-            setTotalComission(comissions.reduce((total, item) => total + parseFloat(item.amount), 0));
+            const commissions = (await getCommissionByUser(param.id)).data;
+            setCommission(commissions);
+            setTotalCommission(commissions.reduce((total, item) => total + parseFloat(item.amount), 0));
             setValue('content_type', 9);
         }
     }
@@ -318,28 +318,30 @@ export default function Detail({ value }) {
                                         </Tab>
                                         {value === "Personal" &&
                                             <Tab
-                                                key="comission"
+                                                key="commission"
                                                 title={"Comisiones"}>
                                                 <Card
                                                     radius="sm"
                                                     shadow="none"
                                                     className="h-full">
                                                     <CardBody>
-                                                        <Input variant="underlined" label={'Total'} startContent={'$'} isReadOnly value={parseFloat(totalComission).toLocaleString()} />
+                                                        <Input variant="underlined" label={'Total'} startContent={'$'} isReadOnly value={parseFloat(totalCommission).toLocaleString()} />
                                                         <div className='flex flex-nowrap flex-col md:flex-wrap md:flex-row w-full h-full overflow-scroll'>
                                                             <Table
-                                                                aria-label="Comission Table"
+                                                                aria-label="Commission Table"
                                                                 radius="sm"
                                                                 shadow="none"
                                                                 className="flex-grow overflow-auto">
                                                                 <TableHeader>
                                                                     <TableColumn>Lote</TableColumn>
+                                                                    <TableColumn>Precio</TableColumn>
                                                                     <TableColumn>Comisión</TableColumn>
                                                                 </TableHeader>
                                                                 <TableBody emptyContent={"No hubieron resultados"}>
-                                                                    {comission.map((row) =>
+                                                                    {commission.map((row) =>
                                                                         <TableRow key={row.id}>
                                                                             <TableCell>{row.plot_data.number}</TableCell>
+                                                                            <TableCell>${parseFloat(row.plot_data.price).toLocaleString()}</TableCell>
                                                                             <TableCell>${row.amount}</TableCell>
                                                                         </TableRow>
                                                                     )}
