@@ -11,12 +11,12 @@ export default function Sales() {
         { name: "Estado", uid: "status", sortable: false },
     ];
     const statusColorMap = {
-        0: "danger",
-        1: "success",
+        true: "success",
+        false: "danger",
     };
     const statusOptions = [
-        { name: "Proceso", uid: true },
-        { name: "Vendido", uid: false },
+        { name: "Al Día", uid: true },
+        { name: "Atraso", uid: false },
     ];
     const cellValues = [
         {
@@ -30,10 +30,10 @@ export default function Sales() {
         },
         {
             thirdColumn: "status",
-            firstValue: "`${item.status === 0 ? true : item.status === 2 ? false : ''}`",
+            firstValue: "`${new Date(item.date_paid).getFullYear() === new Date().getFullYear() && new Date(item.date_paid).getMonth() === new Date().getMonth()}`",
             secondValue: {
-                first: 'Vendido',
-                second: 'Proceso'
+                first: 'Al Día',
+                second: 'Atraso'
             }
         }
     ];
@@ -65,6 +65,7 @@ export default function Sales() {
                 columns={columns}
                 statusColorMap={statusColorMap}
                 statusOptions={statusOptions}
+                statusFilterDefaultValue={false.toString()}
                 cellValues={cellValues}
                 sortedItem={sortedItem}
             />
