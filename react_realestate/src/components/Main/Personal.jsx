@@ -65,6 +65,7 @@ export default function Personal() {
                 columns={columns}
                 statusColorMap={statusColorMap}
                 statusOptions={statusOptions}
+                statusFilterDefaultValue={true.toString()}
                 cellValues={cellValues}
                 sortedItem={sortedItem}
             />
