@@ -8,12 +8,14 @@ import Tigo from '../../assets/images/tigo.png';
 import Claro from '../../assets/images/claro.png';
 import { saveAs } from 'file-saver';
 import { pdf } from '@react-pdf/renderer';
-import { Button } from '@nextui-org/react'
+import { Button, Spinner } from '@nextui-org/react'
 
 export default function PDF() {
     const param = useParams();
     const [data, setData] = React.useState([]);
     const [installment, setInstallment] = React.useState([]);
+    const [isLoading, setIsLoading] = React.useState(true);
+    const [isPdfLoading, setIsPDFLoading] = React.useState(true);
     const styles = StyleSheet.create({
         page: {
             flexDirection: 'column',
@@ -64,6 +66,7 @@ export default function PDF() {
         const res = (await getSpecificSale(param.id)).data;
         setData(res);
         setInstallment((await getAllInstallmentByCustomer(res.customer_data?.id, param.id)).data);
+        setIsLoading(false);
     }
 
     const currentDate = () => {
@@ -73,7 +76,7 @@ export default function PDF() {
     };
 
     const MyPDF = () => (
-        <Document>
+        <Document onRender={() => setIsPDFLoading(false)}>
             <Page size="A4" style={styles.page}>
                 <View style={styles.header}>
                     <Image src={Logo} style={styles.image} />
@@ -183,10 +186,23 @@ export default function PDF() {
     };
     return (
         <>
-        <Button radius='sm' size='lg' className='bg-primary text-white my-2' fullWidth onClick={() => downloadPdf()}>Descargar</Button>
-        <PDFViewer className='w-full h-full'>
-            <MyPDF />
-        </PDFViewer>
+            {isLoading ? (
+                <div className="flex items-center justify-center w-full h-full">
+                    <Spinner size="lg" />
+                </div>
+            ) : (
+                <>
+                    <Button radius='sm' size='lg' className='bg-primary text-white my-2' fullWidth onClick={() => downloadPdf()}>Descargar</Button>
+                    {isPdfLoading && (
+                        <div className="flex items-center justify-center w-full h-full">
+                            <Spinner size="lg" />
+                        </div>
+                    )}
+                    <PDFViewer className='w-full h-full'>
+                        <MyPDF />
+                    </PDFViewer>
+                </>
+            )}
         </>
     );
 }
