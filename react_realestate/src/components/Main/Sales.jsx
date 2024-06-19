@@ -30,7 +30,7 @@ export default function Sales() {
         },
         {
             thirdColumn: "status",
-            firstValue: "`${new Date(item.date_paid).getFullYear() === new Date().getFullYear() && new Date(item.date_paid).getMonth() === new Date().getMonth()}`",
+            firstValue: "`${new Date(item.date_paid).getFullYear() > new Date().getFullYear() || (new Date(item.date_paid).getFullYear() === new Date().getFullYear() && new Date(item.date_paid).getMonth() >= new Date().getMonth())}`",
             secondValue: {
                 first: 'Al Día',
                 second: 'Atraso'
