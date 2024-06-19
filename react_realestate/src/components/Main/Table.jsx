@@ -9,14 +9,14 @@ function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-export default function Tables({ value, showStatusDropdown, showColumnsDropdown, showAddButton, typeOfData, axiosResponse, fetchData, INITIAL_VISIBLE_COLUMNS, columns, statusColorMap, statusOptions, cellValues, sortedItem }) {
+export default function Tables({ value, showStatusDropdown, showColumnsDropdown, showAddButton, typeOfData, axiosResponse, fetchData, INITIAL_VISIBLE_COLUMNS, columns, statusColorMap, statusOptions, statusFilterDefaultValue, cellValues, sortedItem }) {
     const param = useParams();
     const navigate = useNavigate();
     const [axiosData, setAxiosData] = React.useState([])
     const [filterValue, setFilterValue] = React.useState("");
     const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
     const [visibleColumns, setVisibleColumns] = React.useState(new Set(INITIAL_VISIBLE_COLUMNS));
-    const [statusFilter, setStatusFilter] = React.useState(new Set([true.toString()]));
+    const [statusFilter, setStatusFilter] = React.useState(new Set([statusFilterDefaultValue]));
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
     const [sortDescriptor, setSortDescriptor] = React.useState({
         column: cellValues[0].firstValue,
@@ -112,9 +112,12 @@ export default function Tables({ value, showStatusDropdown, showColumnsDropdown,
                     </div>
                 );
             case cellValues[2].thirdColumn:
-                const statusText = cellValue ? cellValues[2].secondValue.first : cellValues[2].secondValue.second;
+                let booleanValue;
+                if (eval(cellValues[2].firstValue) === 'true') booleanValue = true
+                else booleanValue = false
+                const statusText = booleanValue ? cellValues[2].secondValue.first : cellValues[2].secondValue.second;
                 return (
-                    <Chip className="capitalize my-2" color={statusColorMap[cellValue]} size="sm" variant="flat">
+                    <Chip className="capitalize my-2" color={statusColorMap[booleanValue]} size="sm" variant="flat">
                         {statusText}
                     </Chip>
                 );
@@ -169,7 +172,7 @@ export default function Tables({ value, showStatusDropdown, showColumnsDropdown,
                                         aria-label="Table Columns"
                                         closeOnSelect={false}
                                         selectedKeys={statusFilter}
-                                        selectionMode="multiple"
+                                        selectionMode="single"
                                         onSelectionChange={setStatusFilter}>
                                         {statusOptions.map((status) => (
                                             <DropdownItem key={status.uid} className="capitalize">
