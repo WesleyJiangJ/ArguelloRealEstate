@@ -19,6 +19,8 @@ export default function SalesModal({ isOpen, onOpenChange, updateTable }) {
             id_plot: '',
             price: '',
             premium: '',
+            sale_commission: '',
+            penalty_commission: '',
             debt: '',
             installments: '',
         }
@@ -254,6 +256,71 @@ export default function SalesModal({ isOpen, onOpenChange, updateTable }) {
                                                 value={eachInstallment > 0 ? parseFloat(eachInstallment).toFixed(2) : ''}
                                                 isReadOnly
                                                 startContent={'$'}
+                                            />
+                                            <Controller
+                                                name="sale_commission"
+                                                control={control}
+                                                rules={{
+                                                    required: true,
+                                                    validate: value => {
+                                                        if (parseInt(value) < 0) {
+                                                            return 'The sale commision cannot be negative';
+                                                        }
+                                                        return true;
+                                                    }
+                                                }}
+                                                render={({ field }) => (
+                                                    <Input
+                                                        {...field}
+                                                        label={'Comisión de Venta'}
+                                                        variant="underlined"
+                                                        placeholder="0.00"
+                                                        endContent={'%'}
+                                                        type="number"
+                                                        isInvalid={errors.sale_commission ? true : false}
+                                                        onChange={(e) => {
+                                                            field.onChange(e);
+                                                            if (parseInt(e.target.value) < 0) {
+                                                                setError('sale_commission');
+                                                            }
+                                                            else {
+                                                                clearErrors('sale_commission');
+                                                            }
+                                                        }}
+                                                    />
+                                                )}
+                                            />
+                                            <Controller
+                                                name="penalty_commission"
+                                                control={control}
+                                                rules={{
+                                                    required: true,
+                                                    validate: value => {
+                                                        if (parseInt(value) < 0) {
+                                                            return 'The penalty commision cannot be negative';
+                                                        }
+                                                        return true;
+                                                    }
+                                                }}
+                                                render={({ field }) => (
+                                                    <Input
+                                                        {...field}
+                                                        label={'Interés Moratorio'}
+                                                        variant="underlined"
+                                                        placeholder="0.00"
+                                                        endContent={'%'}
+                                                        isInvalid={errors.penalty_commission ? true : false}
+                                                        onChange={(e) => {
+                                                            field.onChange(e);
+                                                            if (parseInt(e.target.value) < 0) {
+                                                                setError('penalty_commission');
+                                                            }
+                                                            else {
+                                                                clearErrors('penalty_commission');
+                                                            }
+                                                        }}
+                                                    />
+                                                )}
                                             />
                                         </div>
                                     </div>

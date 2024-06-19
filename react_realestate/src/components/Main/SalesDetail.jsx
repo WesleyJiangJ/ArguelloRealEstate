@@ -84,7 +84,7 @@ export default function SalesDetail() {
                 await patchSale(param.id, updateData)
                 if (updateData.status === 1) {
                     await patchPlot(saleData.id_plot, { status: 2 });
-                    await postCommission({ id_personal: saleData.id_personal, id_plot: saleData.id_plot, amount: (parseFloat(saleData.price) * 0.05) });
+                    await postCommission({ id_personal: saleData.id_personal, id_plot: saleData.id_plot, amount: (parseFloat(saleData.price) * (parseFloat(saleData.sale_commission) / 100)) });
                 }
                 sweetToast("success", `Se abonaron $${data.amount}`);
                 reset();
@@ -229,6 +229,20 @@ export default function SalesDetail() {
                                                     label="Restante"
                                                     startContent={'$'}
                                                     value={`${(saleData.price - totalPaid).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                                                />
+                                                <Input
+                                                    variant="underlined"
+                                                    isReadOnly
+                                                    label="Comisión de Venta"
+                                                    endContent={'%'}
+                                                    value={`${saleData.sale_commission}`}
+                                                />
+                                                <Input
+                                                    variant="underlined"
+                                                    isReadOnly
+                                                    label="Interés Moratorio"
+                                                    endContent={'%'}
+                                                    value={`${saleData.penalty_commission}`}
                                                 />
                                             </div>
                                         </div>
