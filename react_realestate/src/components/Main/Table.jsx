@@ -59,8 +59,7 @@ export default function Tables({ value, showStatusDropdown, showColumnsDropdown,
         if (hasSearchFilter) {
             filteredData = filteredData.filter((item) =>
                 eval(cellValues[0].firstValue).toLowerCase().includes(filterValue.toLowerCase()) ||
-                eval(cellValues[0].secondValue).toLowerCase().includes(filterValue.toLowerCase()) ||
-                eval(cellValues[1].firstValue).toLowerCase().includes(filterValue.toLowerCase())
+                eval(cellValues[0].secondValue).toLowerCase().includes(filterValue.toLowerCase())
             );
         }
         if (statusFilter !== "all" && Array.from(statusFilter).length !== statusOptions.length) {
@@ -90,6 +89,11 @@ export default function Tables({ value, showStatusDropdown, showColumnsDropdown,
             return sortDescriptor.direction === "descending" ? -cmp : cmp;
         });
     }, [sortDescriptor, items]);
+
+    const formatDate = (dateString) => {
+        const [year, month, day] = dateString.split('-');
+        return `${day}/${month}/${year}`;
+    };
 
     const renderCell = React.useCallback((item, columnKey) => {
         const cellValue = item[columnKey];
