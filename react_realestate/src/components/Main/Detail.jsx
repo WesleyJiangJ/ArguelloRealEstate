@@ -336,12 +336,14 @@ export default function Detail({ value }) {
                                                                     <TableColumn>Lote</TableColumn>
                                                                     <TableColumn>Precio</TableColumn>
                                                                     <TableColumn>Comisión</TableColumn>
+                                                                    <TableColumn>Total</TableColumn>
                                                                 </TableHeader>
                                                                 <TableBody emptyContent={"No hubieron resultados"}>
                                                                     {commission.map((row) =>
                                                                         <TableRow key={row.id}>
                                                                             <TableCell>{row.plot_data.number}</TableCell>
                                                                             <TableCell>${parseFloat(row.plot_data.price).toLocaleString()}</TableCell>
+                                                                            <TableCell>{(parseFloat(row.amount) / parseFloat(row.plot_data.price) * 100)}%</TableCell>
                                                                             <TableCell>${row.amount}</TableCell>
                                                                         </TableRow>
                                                                     )}
