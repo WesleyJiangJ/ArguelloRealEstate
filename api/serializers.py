@@ -58,3 +58,26 @@ class CommissionSerializer(serializers.ModelSerializer):
         plot_representation = PlotSerializer(instance.id_plot).data
         representation["plot_data"] = plot_representation
         return representation
+
+
+class PenaltySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Penalty
+        fields = "__all__"
+
+    def to_representation(self, instance):
+        representation = super(PenaltySerializer, self).to_representation(instance)
+        sale_representation = SaleSerializer(instance.id_sale).data
+        representation["sale_data"] = sale_representation
+        return representation
+
+
+class PenaltyHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PenaltyHistory
+        fields = "__all__"
+
+class PenaltyPaymentsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PenaltyPayments
+        fields = "__all__"
