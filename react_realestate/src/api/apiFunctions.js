@@ -32,6 +32,18 @@ const commissionAPI = axios.create({
     baseURL: 'http://localhost:8000/commission/'
 })
 
+const penaltyAPI = axios.create({
+    baseURL: 'http://localhost:8000/penalty/'
+})
+
+const penaltyHistoryAPI = axios.create({
+    baseURL: 'http://localhost:8000/penalty_history/'
+})
+
+const penaltyPaymentAPI = axios.create({
+    baseURL: 'http://localhost:8000/penalty_payments/'
+})
+
 // Customer
 export const getAllCustomers = () => {
     return customerAPI.get('/');
@@ -141,4 +153,35 @@ export const postCommission = (data) => {
 
 export const getCommissionByUser = (id_personal) => {
     return commissionAPI.get(`?id_personal=${id_personal}`);
+}
+
+// Penalty
+export const getPenalty = (id) => {
+    return penaltyAPI.get(`?id_sale=${id}`);
+}
+
+export const postPenalty = (data) => {
+    return penaltyAPI.post('/', data);
+}
+
+export const patchPenalty = (id, data) => {
+    return penaltyAPI.patch(`/${id}/`, data);
+}
+
+// Penalty History
+export const postPenaltyHistory = (data) => {
+    return penaltyHistoryAPI.post('/', data);
+}
+
+export const getPenaltyHistory = (id) => {
+    return penaltyHistoryAPI.get(`?id_penalty=${id}`);
+}
+
+// Penalty Payments
+export const postPenaltyPayment = (data) => {
+    return penaltyPaymentAPI.post('/', data);
+}
+
+export const getPenaltyPayment = (id) => {
+    return penaltyPaymentAPI.get(`?id_penalty=${id}`);
 }
