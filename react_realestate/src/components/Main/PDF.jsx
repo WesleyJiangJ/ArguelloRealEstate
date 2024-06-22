@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams } from "react-router-dom";
-import { getAllInstallmentByCustomer, getSpecificSale } from "../../api/apiFunctions"
+import { getAllInstallmentByCustomer, getPenalty, getSpecificSale } from "../../api/apiFunctions"
 import { Page, Text, View, Document, Image, StyleSheet, PDFViewer } from '@react-pdf/renderer';
 import Logo from '../../assets/images/logo.png';
 import Stamp from '../../assets/images/stamp.png';
@@ -14,6 +14,8 @@ export default function PDF() {
     const param = useParams();
     const [data, setData] = React.useState([]);
     const [installment, setInstallment] = React.useState([]);
+    const [showPenalty, setShowPenalty] = React.useState(false);
+    const [penalty, setPenalty] = React.useState(0);
     const [isLoading, setIsLoading] = React.useState(true);
     const [isPdfLoading, setIsPDFLoading] = React.useState(true);
     const styles = StyleSheet.create({
@@ -66,6 +68,11 @@ export default function PDF() {
         const res = (await getSpecificSale(param.id)).data;
         setData(res);
         setInstallment((await getAllInstallmentByCustomer(res.customer_data?.id, param.id)).data);
+        const penalty = (await getPenalty(param.id)).data;
+        if (penalty.length !== 0) {
+            setPenalty(penalty[0].total);
+            setShowPenalty(true);
+        }
         setIsLoading(false);
     }
 
@@ -154,6 +161,17 @@ export default function PDF() {
                                 {`$${(parseFloat(data.price) - parseFloat(data.total_paid)).toLocaleString()}`}
                             </Text>
                         </View>
+
+                        {showPenalty &&
+                            <View style={[{ flexDirection: 'row', justifyContent: 'space-between' }]}>
+                                <Text style={[styles.text]}>
+                                    Mora
+                                </Text>
+                                <Text style={[styles.text]}>
+                                    {`$${parseFloat(penalty).toLocaleString()}`}
+                                </Text>
+                            </View>
+                        }
 
                     </View>
                     <View style={[{ flexDirection: 'column', marginTop: 'auto', padding: 10, backgroundColor: '#F2F5F8' }]}>
