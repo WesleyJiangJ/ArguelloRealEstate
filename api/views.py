@@ -1,7 +1,7 @@
 from rest_framework import viewsets
+from django_filters.rest_framework import DjangoFilterBackend
 from api.serializers import *
 from api.models import *
-from django_filters.rest_framework import DjangoFilterBackend
 
 
 class CustomerViewSet(viewsets.ModelViewSet):
@@ -50,3 +50,23 @@ class CommissionViewSet(viewsets.ModelViewSet):
     serializer_class = CommissionSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["id_personal"]
+
+
+class PenaltyViewSet(viewsets.ModelViewSet):
+    queryset = Penalty.objects.all()
+    serializer_class = PenaltySerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["id_sale"]
+
+
+class PenaltyHistoryViewSet(viewsets.ModelViewSet):
+    queryset = PenaltyHistory.objects.all()
+    serializer_class = PenaltyHistorySerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["id_penalty"]
+
+class PenaltyPaymentsViewSet(viewsets.ModelViewSet):
+    queryset = PenaltyPayments.objects.all()
+    serializer_class = PenaltyPaymentsSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["id_penalty"]
