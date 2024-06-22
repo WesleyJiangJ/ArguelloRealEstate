@@ -1,21 +1,24 @@
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form"
-import { Card, CardHeader, CardBody, Button, Input, Textarea, DatePicker, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Spinner } from "@nextui-org/react";
-import { getAllInstallmentByCustomer, getNote, getNotes, getSpecificSale, postInstallment, postNote, deleteNote, patchSale, patchPlot, postCommission } from "../../api/apiFunctions"
+import { Card, CardHeader, CardBody, Button, Input, Textarea, DatePicker, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Spinner, useDisclosure } from "@nextui-org/react";
+import { getAllInstallmentByCustomer, getNote, getNotes, getSpecificSale, postInstallment, postNote, deleteNote, patchSale, patchPlot, postCommission, postPenalty, getPenalty, postPenaltyHistory, getPenaltyHistory, patchPenalty, getPenaltyPayment } from "../../api/apiFunctions"
 import { today } from "@internationalized/date";
 import { ChatBubbleOvalLeftEllipsisIcon, PlusIcon, ArrowPathIcon, TrashIcon } from "@heroicons/react/24/outline"
 import { sweetAlert, sweetToast } from "./Alert";
+import Penalty from "./Penalty";
 
 export default function SalesDetail() {
     const param = useParams();
     const navigate = useNavigate();
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const [isLoading, setIsLoading] = React.useState(true);
     const [saleData, setSaleData] = React.useState([]);
     const [installmentData, setInstallmentData] = React.useState([]);
     const [totalPaid, setTotalPaid] = React.useState(0);
     const [notes, setNotes] = React.useState([]);
     const [noteID, setNoteID] = React.useState('');
+    const [showPenalty, setShowPenalty] = React.useState(false);
     const { control, handleSubmit, formState: { errors }, reset, watch, setError, clearErrors } = useForm({
         defaultValues: {
             id_sale: parseInt(param.id),
@@ -58,10 +61,118 @@ export default function SalesDetail() {
                 setTotalPaid(totalPaid);
                 setIsLoading(false);
             }
+
+            const saleDate = new Date(saleData.date_paid);
+            const currentDate = new Date();
+            // const currentDate = new Date('2024-12-02');
+            // Extract the month and year from the date of the sale and the current date
+            const saleMonth = saleDate.getMonth();
+            const saleYear = saleDate.getFullYear();
+            const currentMonth = currentDate.getMonth();
+            const currentYear = currentDate.getFullYear();
+
+            if (saleYear < currentYear || (saleYear === currentYear && saleMonth < currentMonth)) {
+                if (saleData.date_paid !== null) {
+                    penalty(saleData);
+                }
+            }
+
         } catch (error) {
             console.error("Error loading data:", error);
         }
     };
+
+    const penalty = async (data) => {
+        const last_date = new Date(data.date_paid);
+        const current_date = new Date();
+        // const current_date = new Date('2024-10-02');
+        const years = current_date.getFullYear() - last_date.getFullYear();
+        const months = current_date.getMonth() - last_date.getMonth();
+        // Count how many months have passed
+        const total_months = years * 12 + months - 1;
+        // Start from the month following the last_date
+        last_date.setMonth(last_date.getMonth() + 1);
+        const dates_array = [];
+        const total_debt_penalty = [];
+        const monthly_payment = ((parseFloat(data.price) - parseFloat(data.premium)) / parseFloat(data.installments));
+        const penalty_percentage = parseFloat(data.penalty_commission) / 100;
+        let penalty_total = 0;
+
+        // Create the date array and calculate monthly debts and penalties
+        for (let i = 0; i < total_months; i++) {
+            dates_array.push(last_date.toISOString().split('T')[0]); // Format YYYY-MM-DD
+            last_date.setMonth(last_date.getMonth() + 1);
+            const debt = (i + 1) * monthly_payment;
+            const penalty = debt * penalty_percentage;
+            penalty_total += penalty;
+            total_debt_penalty.push({ date: dates_array[i], monthly_debt: monthly_payment, total_debt: debt, penalty: parseFloat(penalty).toFixed(2) });
+        }
+
+        const get_penalty = (await getPenalty(data.id)).data;
+        if (get_penalty.length === 0) {
+            await postPenalty({ id_sale: data.id, total: parseFloat(penalty_total).toFixed(2) })
+                .then(async (response) => {
+                    total_debt_penalty.map(async (element) => {
+                        await postPenaltyHistory(
+                            {
+                                id_penalty: response.data.id,
+                                date: element.date,
+                                monthly_debt: parseFloat(monthly_payment).toFixed(2),
+                                total_debt: parseFloat(element.total_debt).toFixed(2),
+                                penalty: element.penalty
+                            }).catch(error => console.log(error));
+                    });
+                })
+                .catch(error => console.log(error));
+        }
+        else {
+            const penalty_history = (await getPenaltyHistory(get_penalty[0].id)).data.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            // Function to extract month and year from a date
+            const extractMonthAndYear = (date) => {
+                const d = new Date(date);
+                return `${d.getFullYear()}-${d.getMonth() + 1}`;
+            };
+
+            // Extract month and year from penalty_history and total_debt_penalty
+            const datesArray1 = penalty_history.map(item => extractMonthAndYear(item.date));
+
+            // Convert datesArray1 to a set for faster search
+            const datesSet1 = new Set(datesArray1);
+
+            // Find dates in total debt penalty that are not in penalty_history
+            const newValues = total_debt_penalty.filter(item => !datesSet1.has(extractMonthAndYear(item.date)));
+
+            let penalty_sum = 0;
+            penalty_history.map((element) => {
+                penalty_sum += parseFloat(element['penalty']);
+            })
+
+            if (newValues.length !== 0) {
+                newValues.map(async (element) => {
+                    await postPenaltyHistory(
+                        {
+                            id_penalty: get_penalty[0].id,
+                            date: element.date,
+                            monthly_debt: parseFloat(monthly_payment).toFixed(2),
+                            total_debt: parseFloat(element.total_debt).toFixed(2),
+                            penalty: element.penalty
+                        })
+                        .then(async () => {
+                            const resTotal = (await getPenaltyPayment(get_penalty[0].id)).data;
+                            let totalPaidSum = 0;
+                            resTotal.map((element) => {
+                                totalPaidSum += parseFloat(element.amount);
+                            })
+                            const totalPost = (penalty_sum - totalPaidSum) + parseFloat(element.penalty);
+                            await patchPenalty(get_penalty[0].id, { total: parseFloat(totalPost).toFixed(2) })
+                        })
+                        .catch(error => console.log(error))
+                });
+            }
+        }
+        setShowPenalty(true);
+    }
 
     const onSubmit = async (data) => {
         data.date = data.date.year + '-' + String(data.date.month).padStart(2, '0') + '-' + String(data.date.day).padStart(2, '0');
@@ -262,6 +373,16 @@ export default function SalesDetail() {
                                             onClick={() => navigate(`/main/sales/detail/${saleData.id}/invoice`)}>
                                             Generar Factura
                                         </Button>
+                                        {showPenalty &&
+                                            <Button
+                                                color="primary"
+                                                radius="sm"
+                                                variant="light"
+                                                className="h-16 m:h-full lg:h-full"
+                                                onClick={() => onOpen()}>
+                                                Mora
+                                            </Button>
+                                        }
                                         <Button
                                             color="success"
                                             radius="sm"
@@ -536,6 +657,9 @@ export default function SalesDetail() {
                     </div>
                 </div>
             )}
+            {showPenalty &&
+                <Penalty isOpen={isOpen} onOpenChange={onOpenChange} id_sale={param.id} />
+            }
         </>
     );
 }
