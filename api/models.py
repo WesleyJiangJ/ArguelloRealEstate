@@ -101,3 +101,20 @@ class Installment(models.Model):
 
     def __str__(self):
         return f"{self.id_sale}"
+
+class Penalty(models.Model):
+    id_sale = models.ForeignKey(Sale, on_delete=models.CASCADE)
+    total = models.DecimalField(max_digits=10, decimal_places=2)
+
+class PenaltyHistory(models.Model):
+    id_penalty = models.ForeignKey(Penalty, on_delete=models.CASCADE)
+    date = models.DateField()
+    monthly_debt = models.DecimalField(max_digits=10, decimal_places=2)
+    total_debt = models.DecimalField(max_digits=10, decimal_places=2)
+    penalty = models.DecimalField(max_digits=10, decimal_places=2)
+
+class PenaltyPayments(models.Model):
+    TYPE_CHOICES = [(0, "Payment"), (1, "Exempt")]
+    id_penalty = models.ForeignKey(Penalty, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    payment_type = models.CharField(max_length=1, choices=TYPE_CHOICES)
