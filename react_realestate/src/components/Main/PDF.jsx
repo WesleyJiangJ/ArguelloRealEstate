@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams } from "react-router-dom";
-import { getAllInstallmentByCustomer, getPenalty, getSpecificSale } from "../../api/apiFunctions"
+import { getAllInstallmentByCustomer, getPenalty, getSpecificSale, getPDFInformation } from "../../api/apiFunctions"
 import { Page, Text, View, Document, Image, StyleSheet, PDFViewer, pdf } from '@react-pdf/renderer';
 import Logo from '../../assets/images/logo.png';
 import Stamp from '../../assets/images/stamp.png';
@@ -15,6 +15,7 @@ export default function PDF() {
     const [installment, setInstallment] = React.useState([]);
     const [showPenalty, setShowPenalty] = React.useState(false);
     const [penalty, setPenalty] = React.useState(0);
+    const [pdfInformation, setPDFInformation] = React.useState([]);
     const [isLoading, setIsLoading] = React.useState(true);
     const [isPdfLoading, setIsPDFLoading] = React.useState(true);
     const styles = StyleSheet.create({
@@ -64,6 +65,7 @@ export default function PDF() {
     }, [param.id]);
 
     const loadData = async () => {
+        setPDFInformation((await getPDFInformation(1)).data);
         const res = (await getSpecificSale(param.id)).data;
         setData(res);
         setInstallment((await getAllInstallmentByCustomer(res.customer_data?.id, param.id)).data);
@@ -176,17 +178,17 @@ export default function PDF() {
                     <View style={[{ flexDirection: 'column', marginTop: 'auto', padding: 10, backgroundColor: '#F2F5F8' }]}>
                         <Text style={styles.footer_text}>Emitido por área de cobranza</Text>
                         <Text style={styles.footer_text}>Este recibo respalda el pago reflejado en el comprobante del mes indicado</Text>
-                        <Text style={styles.footer_text}>Deposite a la cuenta bancaria N°:10020210106121 a nombre de Jorge Alberto Arguello Espinoza</Text>
+                        <Text style={styles.footer_text}>{`Deposite a la cuenta bancaria N°:${pdfInformation.bank_account} a nombre de ${pdfInformation.name}`}</Text>
                         <View style={[{ flexDirection: 'row', justifyContent: 'space-between' }]}>
                             <View style={[{ flexDirection: 'column' }]}>
                                 <Text style={styles.footer_text}>Oficina Central</Text>
                                 <View style={[{ flexDirection: 'row' }]}>
-                                    <Image src={Tigo} style={[{ marginRight: '5px', width: '15px', height: '15px' }]} />
-                                    <Text style={[styles.footer_text]}>+505 8544-1412</Text>
+                                    <Image src={pdfInformation.phone_number_one_company === 0 ? Tigo : Claro} style={[{ marginRight: '5px', width: '15px', height: '15px' }]} />
+                                    <Text style={[styles.footer_text]}>+505 {pdfInformation.phone_number_one}</Text>
                                 </View>
                                 <View style={[{ flexDirection: 'row' }]}>
-                                    <Image src={Claro} style={[{ marginRight: '5px', width: '15px', height: '15px' }]} />
-                                    <Text style={[styles.footer_text]}>+505 8535-8435</Text>
+                                    <Image src={pdfInformation.phone_number_two_company === 0 ? Tigo : Claro} style={[{ marginRight: '5px', width: '15px', height: '15px' }]} />
+                                    <Text style={[styles.footer_text]}>+505 {pdfInformation.phone_number_two}</Text>
                                 </View>
                             </View>
                             <Image src={Stamp} style={[{ width: '90px', height: '90px' }]} />
