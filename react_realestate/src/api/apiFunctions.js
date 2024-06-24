@@ -44,6 +44,10 @@ const penaltyPaymentAPI = axios.create({
     baseURL: 'http://localhost:8000/penalty_payments/'
 })
 
+const pdfInfoAPI = axios.create({
+    baseURL: 'http://localhost:8000/pdfinfo/'
+})
+
 // Customer
 export const getAllCustomers = () => {
     return customerAPI.get('/');
@@ -184,4 +188,13 @@ export const postPenaltyPayment = (data) => {
 
 export const getPenaltyPayment = (id) => {
     return penaltyPaymentAPI.get(`?id_penalty=${id}`);
+}
+
+// PDF Information
+export const getPDFInformation = (id) => {
+    return pdfInfoAPI.get(`/${id}/`);
+}
+
+export const patchPDFInformation = (id, data) => {
+    return pdfInfoAPI.patch(`/${id}/`, data);
 }
