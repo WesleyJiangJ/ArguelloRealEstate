@@ -189,7 +189,7 @@ export default function SalesDetail() {
                 updateData.status = 1;
             }
         }
-        await sweetAlert(`¿Deseas agregar $${data.amount}?`, `En concepto de ${installmentData.length === 0 ? 'prima' : 'cuota'}`, 'question', 'success', 'Hecho');
+        await sweetAlert(`¿Deseas agregar $${data.amount}?`, `En concepto de ${installmentData.length === 0 ? 'prima' : 'cuota'} a fecha de ${data.date}`, 'question', 'success', 'Hecho');
         await postInstallment(data)
             .then(async () => {
                 await patchSale(param.id, updateData)
@@ -373,16 +373,14 @@ export default function SalesDetail() {
                                             onClick={() => navigate(`/main/sales/detail/${saleData.id}/invoice`)}>
                                             Generar Factura
                                         </Button>
-                                        {showPenalty &&
-                                            <Button
-                                                color="primary"
-                                                radius="sm"
-                                                variant="light"
-                                                className="h-16 m:h-full lg:h-full"
-                                                onClick={() => onOpen()}>
-                                                Mora
-                                            </Button>
-                                        }
+                                        <Button
+                                            color="primary"
+                                            radius="sm"
+                                            variant="light"
+                                            className="h-16 m:h-full lg:h-full"
+                                            onClick={() => onOpen()}>
+                                            Mora
+                                        </Button>
                                         <Button
                                             color="success"
                                             radius="sm"
@@ -657,9 +655,7 @@ export default function SalesDetail() {
                     </div>
                 </div>
             )}
-            {showPenalty &&
-                <Penalty isOpen={isOpen} onOpenChange={onOpenChange} id_sale={param.id} />
-            }
+            <Penalty isOpen={isOpen} onOpenChange={onOpenChange} id_sale={param.id} showPenalty={showPenalty} />
         </>
     );
 }
