@@ -1,13 +1,12 @@
 import React from 'react';
 import { useParams } from "react-router-dom";
 import { getAllInstallmentByCustomer, getPenalty, getSpecificSale } from "../../api/apiFunctions"
-import { Page, Text, View, Document, Image, StyleSheet, PDFViewer } from '@react-pdf/renderer';
+import { Page, Text, View, Document, Image, StyleSheet, PDFViewer, pdf } from '@react-pdf/renderer';
 import Logo from '../../assets/images/logo.png';
 import Stamp from '../../assets/images/stamp.png';
 import Tigo from '../../assets/images/tigo.png';
 import Claro from '../../assets/images/claro.png';
 import { saveAs } from 'file-saver';
-import { pdf } from '@react-pdf/renderer';
 import { Button, Spinner } from '@nextui-org/react'
 
 export default function PDF() {
@@ -62,7 +61,7 @@ export default function PDF() {
 
     React.useEffect(() => {
         loadData();
-    }, []);
+    }, [param.id]);
 
     const loadData = async () => {
         const res = (await getSpecificSale(param.id)).data;
