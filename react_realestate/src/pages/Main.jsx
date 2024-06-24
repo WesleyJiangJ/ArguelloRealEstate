@@ -27,6 +27,8 @@ export default function Main() {
                     return titles.personal;
                 case 'sales':
                     return titles.sales;
+                case 'settings':
+                    return titles.settings;
                 default:
                     return ''
             }

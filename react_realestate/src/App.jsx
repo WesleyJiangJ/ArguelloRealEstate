@@ -18,7 +18,8 @@ function App() {
       customer: 'Clientes',
       plot: 'Lotes',
       personal: 'Personal',
-      sales: 'Ventas'
+      sales: 'Ventas',
+      settings: 'Ajustes'
     },
   };
   return (
