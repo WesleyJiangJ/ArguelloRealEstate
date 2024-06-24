@@ -77,7 +77,14 @@ class PenaltyHistorySerializer(serializers.ModelSerializer):
         model = PenaltyHistory
         fields = "__all__"
 
+
 class PenaltyPaymentsSerializer(serializers.ModelSerializer):
     class Meta:
         model = PenaltyPayments
+        fields = "__all__"
+
+
+class PDFInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PDFInformation
         fields = "__all__"
