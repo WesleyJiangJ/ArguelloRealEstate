@@ -14,6 +14,7 @@ router.register(r"commission", views.CommissionViewSet)
 router.register(r"penalty", views.PenaltyViewSet)
 router.register(r"penalty_history", views.PenaltyHistoryViewSet)
 router.register(r"penalty_payments", views.PenaltyPaymentsViewSet)
+router.register(r"pdfinfo", views.PDFInfoViewSet)
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
