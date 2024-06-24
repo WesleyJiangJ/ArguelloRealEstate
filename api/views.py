@@ -65,8 +65,14 @@ class PenaltyHistoryViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["id_penalty"]
 
+
 class PenaltyPaymentsViewSet(viewsets.ModelViewSet):
     queryset = PenaltyPayments.objects.all()
     serializer_class = PenaltyPaymentsSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["id_penalty"]
+
+
+class PDFInfoViewSet(viewsets.ModelViewSet):
+    queryset = PDFInformation.objects.all()
+    serializer_class = PDFInfoSerializer
