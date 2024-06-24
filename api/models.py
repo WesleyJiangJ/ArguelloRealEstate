@@ -118,3 +118,12 @@ class PenaltyPayments(models.Model):
     id_penalty = models.ForeignKey(Penalty, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     payment_type = models.CharField(max_length=1, choices=TYPE_CHOICES)
+
+class PDFInformation(models.Model):
+    TYPE_CHOICES = [(0, "Tigo"), (1, "Claro")]
+    name = models.CharField(max_length=100)
+    bank_account = models.CharField(max_length=50)
+    phone_number_one = models.CharField(max_length=8)
+    phone_number_one_company = models.CharField(max_length=1, choices=TYPE_CHOICES)
+    phone_number_two = models.CharField(max_length=8)
+    phone_number_two_company = models.CharField(max_length=1, choices=TYPE_CHOICES)
