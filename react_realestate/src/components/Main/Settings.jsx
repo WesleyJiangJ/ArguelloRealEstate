@@ -1,10 +1,12 @@
 import React from "react";
 import { useForm, Controller } from "react-hook-form"
-import { Tabs, Tab, Card, CardBody, Input, Select, SelectItem, Button } from "@nextui-org/react";
+import { Tabs, Tab, Input, Select, SelectItem, Button } from "@nextui-org/react";
 import { sweetAlert, sweetToast } from "./Alert";
-import { getPDFInformation, patchPDFInformation } from "../../api/apiFunctions";
+import { getPDFInformation, patchPDFInformation, downloadDatabase, handleFileUpload } from "../../api/apiFunctions";
+import { PlusIcon, ArrowUpTrayIcon } from '@heroicons/react/24/solid'
 
 export default function Settings() {
+    const [file, setFile] = React.useState(null);
     const [prevData, setPrevData] = React.useState({});
     const { control, handleSubmit, formState: { errors }, reset } = useForm({
         defaultValues: {
@@ -60,10 +62,47 @@ export default function Settings() {
             sweetToast('warning', 'No se realizaron modificaciones');
         }
     }
+
+    const handleFileChange = (event) => {
+        setFile(event.target.files[0]);
+    };
+
     return (
         <>
             <div className="flex w-full flex-col">
                 <Tabs aria-label="Options" fullWidth color="primary">
+                    <Tab key="database" title="Base de datos" className="flex flex-col gap-10">
+                        <div>
+                            <h1 className="my-2">Exportar</h1>
+                            <Button
+                                color="primary"
+                                size="lg"
+                                radius="sm"
+                                fullWidth
+                                endContent={<ArrowUpTrayIcon className="w-5 h-5" />}
+                                onClick={() => downloadDatabase()}>
+                                Exportar base de datos
+                            </Button>
+                        </div>
+                        <div>
+                            <h1 className="my-2">Importar</h1>
+                            <div className="flex flex-row gap-2">
+                                <input
+                                    className="w-full bg-sidebar rounded-sm"
+                                    type="file"
+                                    onChange={handleFileChange}
+                                />
+                                <Button
+                                    color="primary"
+                                    size='lg'
+                                    radius="sm"
+                                    isIconOnly
+                                    onClick={() => handleFileUpload(file)}>
+                                    <PlusIcon className="w-5 h-5" />
+                                </Button>
+                            </div>
+                        </div>
+                    </Tab>
                     <Tab key="PDFInfo" title="PDF" className="flex flex-col gap-2">
                         <form onSubmit={handleSubmit(onSubmit)}>
                             <Controller
