@@ -1,9 +1,14 @@
 import os
+import smtplib
 from rest_framework import viewsets
 from django_filters.rest_framework import DjangoFilterBackend
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from RealEstate import settings
+from datetime import datetime
+from email import encoders
+from email.mime.base import MIMEBase
+from email.mime.multipart import MIMEMultipart
+from django.conf import settings
 from api.serializers import *
 from api.models import *
 
@@ -113,3 +118,46 @@ def import_database(request):
         return JsonResponse(
             {"status": "error", "message": "No seleccionó ningún archivo"}
         )
+
+
+def send_database():
+    try:
+        DATABASE_PATH = os.path.join(settings.BASE_DIR, "db.sqlite3")
+        EMAIL_USER = "example@gmail.com"
+        EMAIL_PASSWORD = "password"
+        RECIPIENT_EMAIL = "example@gmail.com"
+
+        # Create email
+        msg = MIMEMultipart()
+        msg["From"] = EMAIL_USER
+        msg["To"] = RECIPIENT_EMAIL
+        msg["Subject"] = (
+            f"Respaldo de Bienes Raices Arguello - {datetime.now().strftime('%d/%m/%Y')}"
+        )
+
+        # Attach the file
+        with open(DATABASE_PATH, "rb") as f:
+            part = MIMEBase("application", "octet-stream")
+            part.set_payload(f.read())
+        encoders.encode_base64(part)
+        part.add_header(
+            "Content-Disposition",
+            f"attachment; filename={os.path.basename(DATABASE_PATH)}",
+        )
+        msg.attach(part)
+
+        # Send the email
+        with smtplib.SMTP("smtp.gmail.com", 587) as server:
+            server.starttls()
+            server.login(EMAIL_USER, EMAIL_PASSWORD)
+            server.sendmail(EMAIL_USER, RECIPIENT_EMAIL, msg.as_string())
+
+        return JsonResponse(
+            {
+                "status": "success",
+                "message": "Base de datos enviada por correo electrónico.",
+            }
+        )
+
+    except Exception as e:
+        return JsonResponse({"status": "error", "message": str(e)}, status=500)
