@@ -1,5 +1,9 @@
+import os
 from rest_framework import viewsets
 from django_filters.rest_framework import DjangoFilterBackend
+from django.http import HttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from RealEstate import settings
 from api.serializers import *
 from api.models import *
 
@@ -76,3 +80,36 @@ class PenaltyPaymentsViewSet(viewsets.ModelViewSet):
 class PDFInfoViewSet(viewsets.ModelViewSet):
     queryset = PDFInformation.objects.all()
     serializer_class = PDFInfoSerializer
+
+
+def export_database(request):
+    database_path = os.path.join(settings.BASE_DIR, "db.sqlite3")
+    with open(database_path, "rb") as f:
+        response = HttpResponse(f.read(), content_type="application/x-sqlite3")
+        response["Content-Disposition"] = f'attachment; filename="db.sqlite3"'
+        return response
+
+
+@csrf_exempt
+def import_database(request):
+    if request.method == "POST" and request.FILES.get("database"):
+        database_file = request.FILES["database"]
+        if database_file.name.endswith(".sqlite3"):
+            database_path = os.path.join(settings.BASE_DIR, "db.sqlite3")
+            with open(database_path, "wb+") as destination:
+                for chunk in database_file.chunks():
+                    destination.write(chunk)
+            return JsonResponse(
+                {
+                    "status": "success",
+                    "message": "Base de datos importada satisfactoriamente",
+                }
+            )
+        else:
+            return JsonResponse(
+                {"status": "error", "message": "Formato de archivo incorrecto"}
+            )
+    else:
+        return JsonResponse(
+            {"status": "error", "message": "No seleccionó ningún archivo"}
+        )
