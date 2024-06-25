@@ -3,6 +3,7 @@
 */
 
 import axios from 'axios'
+import { sweetToast } from '../components/Main/Alert'
 
 const customerAPI = axios.create({
     baseURL: 'http://localhost:8000/customer/'
@@ -198,3 +199,41 @@ export const getPDFInformation = (id) => {
 export const patchPDFInformation = (id, data) => {
     return pdfInfoAPI.patch(`/${id}/`, data);
 }
+
+// Export Database
+export const downloadDatabase = async () => {
+    try {
+        const response = await axios.get('http://localhost:8000/export-database/', {
+            responseType: 'blob',
+        });
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'db.sqlite3';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        const toast = response.status === 200;
+        sweetToast(toast ? 'success' : 'error', toast ? 'La base de datos ha sido descargada' : 'Error al exportar la base de datos');
+    } catch (error) {
+        console.error('There was a problem with the axios operation:', error);
+    }
+};
+
+// Import Database
+export const handleFileUpload = async (file) => {
+    const formData = new FormData();
+    formData.append('database', file);
+    try {
+        const response = await axios.post('http://localhost:8000/import-database/', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+
+        const result = response.data;
+        sweetToast(result.status, result.message);
+    } catch (error) {
+        console.error('There was a problem with the axios operation:', error);
+    }
+};
