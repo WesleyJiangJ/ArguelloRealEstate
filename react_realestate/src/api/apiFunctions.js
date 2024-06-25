@@ -3,7 +3,7 @@
 */
 
 import axios from 'axios'
-import { sweetToast } from '../components/Main/Alert'
+import { sweetAlert, sweetToast } from '../components/Main/Alert'
 
 const customerAPI = axios.create({
     baseURL: 'http://localhost:8000/customer/'
@@ -203,6 +203,7 @@ export const patchPDFInformation = (id, data) => {
 // Export Database
 export const downloadDatabase = async () => {
     try {
+        await sweetAlert('¿Desea exportar la base de datos?', '', 'question', 'success', '', '');
         const response = await axios.get('http://localhost:8000/export-database/', {
             responseType: 'blob',
         });
