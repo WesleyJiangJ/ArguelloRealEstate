@@ -22,6 +22,8 @@ urlpatterns = [
     path("", include(router.urls)),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     path("docs/", include_docs_urls(title="API")),
+    path('export-database/', views.export_database, name='export-database'),
+    path('import-database/', views.import_database, name='import-database'),
 ]
 
 urlpatterns += router.urls
