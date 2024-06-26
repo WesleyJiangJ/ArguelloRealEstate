@@ -5,9 +5,11 @@ import { useParams } from "react-router-dom";
 import { getLocalTimeZone, today, parseDate } from "@internationalized/date";
 import { getSpecificCustomer, getSpecificPersonal, postCustomer, postPersonal, patchCustomer, patchPersonal } from "../../api/apiFunctions";
 import { sweetAlert, sweetToast } from "./Alert";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid"
 
 export default function UserModal({ isOpen, onOpenChange, updateTable, reloadData, value }) {
     const param = useParams();
+    const [isVisiblePassword, setIsVisiblePassword] = React.useState(false);
     const { control, handleSubmit, formState: { errors }, reset } = useForm({
         defaultValues: {
             first_name: '',
@@ -18,10 +20,12 @@ export default function UserModal({ isOpen, onOpenChange, updateTable, reloadDat
             dni: '',
             phone_number: '',
             email: '',
+            app_password: '',
             status: true
         }
     });
     const [prevData, setPrevData] = React.useState({});
+    const toggleVisibility = () => setIsVisiblePassword(!isVisiblePassword);
 
     React.useEffect(() => {
         loadData();
@@ -93,6 +97,9 @@ export default function UserModal({ isOpen, onOpenChange, updateTable, reloadDat
                     }
                     else if (key === 'email') {
                         changes.add("correo");
+                    }
+                    else if (key === 'app_password') {
+                        changes.add("contraseña de aplicaciones");
                     }
                 }
             }
@@ -284,6 +291,7 @@ export default function UserModal({ isOpen, onOpenChange, updateTable, reloadDat
                                                 name="email"
                                                 control={control}
                                                 rules={{
+                                                    required: value === 'Personal' ? true : false,
                                                     pattern: {
                                                         value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i
                                                     }
@@ -299,6 +307,34 @@ export default function UserModal({ isOpen, onOpenChange, updateTable, reloadDat
                                                 )}
                                             />
                                         </div>
+                                        {value === 'Personal' &&
+                                            <div className="flex flex-col gap-2 md:flex-row">
+                                                <Controller
+                                                    name="app_password"
+                                                    control={control}
+                                                    rules={{ required: true }}
+                                                    render={({ field }) => (
+                                                        <Input
+                                                            {...field}
+                                                            label='Contraseñas de aplicaciones'
+                                                            variant="underlined"
+                                                            type={isVisiblePassword ? "text" : "password"}
+                                                            isInvalid={errors.app_password ? true : false}
+                                                            maxLength={20}
+                                                            endContent={
+                                                                <Button className="focus:outline-none bg-white" type="button" isIconOnly onClick={toggleVisibility}>
+                                                                    {isVisiblePassword ? (
+                                                                        <EyeIcon className="w-5 h-5" />
+                                                                    ) : (
+                                                                        <EyeSlashIcon className="w-5 h-5" />
+                                                                    )}
+                                                                </Button>
+                                                            }
+                                                        />
+                                                    )}
+                                                />
+                                            </div>
+                                        }
                                     </div>
                                 </ModalBody>
                                 <ModalFooter>
