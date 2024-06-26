@@ -1,7 +1,12 @@
+import re
 from django.db import models
 from django.core.validators import MinLengthValidator
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import User
 
 
 class Notes(models.Model):
@@ -43,14 +48,43 @@ class Personal(models.Model):
     birthdate = models.DateField()
     dni = models.CharField(max_length=16, validators=[MinLengthValidator(16)])
     phone_number = models.CharField(max_length=8)
-    email = models.EmailField(max_length=255, blank=True)
+    email = models.EmailField(max_length=255, blank=False)
     note = GenericRelation(Notes)
+    app_password = models.CharField(max_length=256)
     status = models.BooleanField(default=True)
     modified_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.first_name} {self.middle_name} {self.first_surname} {self.second_surname}"
+
+    def save(self, *args, **kwargs):
+        # Encrypt your password if it's new or changed
+        if self.pk is None:  # New object
+            self.app_password = make_password(self.app_password)
+        else:
+            old_instance = Personal.objects.get(pk=self.pk)
+            if self.app_password != old_instance.app_password:
+                self.app_password = make_password(self.app_password)
+        super().save(*args, **kwargs)
+
+
+@receiver(post_save, sender=Personal)
+def create_user_for_personal(sender, instance, created, **kwargs):
+    if created:
+        first_name = instance.first_name.lower()
+        last_name = instance.first_surname.lower()
+        # Replace spaces with underscores and remove other special characters
+        pswd = f"{first_name}{last_name}"
+        pswd = re.sub(r"\W+", "", pswd)  # Remove non-alphanumeric characters
+        # Create a user with username, email and password
+        User.objects.create_user(
+            username=instance.email,
+            email=instance.email,
+            password=pswd,
+            first_name=instance.first_name,
+            last_name=instance.first_surname,
+        )
 
 
 class Plot(models.Model):
@@ -102,9 +136,11 @@ class Installment(models.Model):
     def __str__(self):
         return f"{self.id_sale}"
 
+
 class Penalty(models.Model):
     id_sale = models.ForeignKey(Sale, on_delete=models.CASCADE)
     total = models.DecimalField(max_digits=10, decimal_places=2)
+
 
 class PenaltyHistory(models.Model):
     id_penalty = models.ForeignKey(Penalty, on_delete=models.CASCADE)
@@ -113,11 +149,13 @@ class PenaltyHistory(models.Model):
     total_debt = models.DecimalField(max_digits=10, decimal_places=2)
     penalty = models.DecimalField(max_digits=10, decimal_places=2)
 
+
 class PenaltyPayments(models.Model):
     TYPE_CHOICES = [(0, "Payment"), (1, "Exempt")]
     id_penalty = models.ForeignKey(Penalty, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     payment_type = models.CharField(max_length=1, choices=TYPE_CHOICES)
+
 
 class PDFInformation(models.Model):
     TYPE_CHOICES = [(0, "Tigo"), (1, "Claro")]
