@@ -8,6 +8,8 @@ from datetime import datetime
 from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from django.conf import settings
 from api.serializers import *
 from api.models import *
@@ -92,6 +94,8 @@ class PDFInfoViewSet(viewsets.ModelViewSet):
     serializer_class = PDFInfoSerializer
 
 
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
 def export_database(request):
     database_path = os.path.join(settings.BASE_DIR, "db.sqlite3")
     with open(database_path, "rb") as f:
@@ -101,6 +105,8 @@ def export_database(request):
 
 
 @csrf_exempt
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def import_database(request):
     if request.method == "POST" and request.FILES.get("database"):
         database_file = request.FILES["database"]
