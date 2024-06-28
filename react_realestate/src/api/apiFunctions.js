@@ -215,6 +215,9 @@ export const downloadDatabase = async () => {
     try {
         await sweetAlert('¿Desea exportar la base de datos?', '', 'question', 'success', '', '');
         const response = await axios.get('http://localhost:8000/export-database/', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+            },
             responseType: 'blob',
         });
         const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -227,7 +230,7 @@ export const downloadDatabase = async () => {
         const toast = response.status === 200;
         sweetToast(toast ? 'success' : 'error', toast ? 'La base de datos ha sido descargada' : 'Error al exportar la base de datos');
     } catch (error) {
-        console.error('There was a problem with the axios operation:', error);
+        console.error('Hubo un problema con la operación:', error);
     }
 };
 
@@ -238,6 +241,7 @@ export const handleFileUpload = async (file) => {
     try {
         const response = await axios.post('http://localhost:8000/import-database/', formData, {
             headers: {
+                'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
                 'Content-Type': 'multipart/form-data'
             }
         });
