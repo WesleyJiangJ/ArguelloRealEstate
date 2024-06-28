@@ -1,9 +1,11 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { Sidebar, Menu, MenuItem } from 'react-pro-sidebar';
+import { sweetAlert } from '../Main/Alert'
 import { HomeModernIcon, UserIcon, BanknotesIcon, UserGroupIcon, CogIcon, ArrowLeftStartOnRectangleIcon, Squares2X2Icon } from "@heroicons/react/24/solid";
 
 export default function SideBar({ collapsed }) {
+    const navigate = useNavigate();
     const menuItemStyles = {
         button: {
             "&:hover": {
@@ -53,7 +55,13 @@ export default function SideBar({ collapsed }) {
                         Ajustes
                     </MenuItem>
                     <MenuItem
-                        icon={<ArrowLeftStartOnRectangleIcon className="h-5 w-5" />}>
+                        icon={<ArrowLeftStartOnRectangleIcon className="h-5 w-5" />}
+                        onClick={async () => {
+                            await sweetAlert('¿Estás seguro que deseas cerrar sesión?', '', 'question', 'success', 'Hasta luego');
+                            localStorage.removeItem('access_token');
+                            localStorage.removeItem('refresh_token');
+                            navigate('/');
+                        }}>
                         Logout
                     </MenuItem>
                 </Menu>
