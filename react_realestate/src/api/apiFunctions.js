@@ -1,53 +1,63 @@
 /*
-    apiFunctions.js makes the connection between React and Django REST
+    apiFunctions.js makes the connection between React and Django REST with Authentification
 */
 
 import axios from 'axios'
 import { sweetAlert, sweetToast } from '../components/Main/Alert'
 
-const customerAPI = axios.create({
-    baseURL: 'http://localhost:8000/customer/'
-})
+const createAPIInstance = (baseURL) => {
+    const apiInstance = axios.create({
+        baseURL: baseURL,
+    });
 
-const personalAPI = axios.create({
-    baseURL: 'http://localhost:8000/personal/'
-})
+    apiInstance.interceptors.request.use(async (config) => {
+        const accessToken = localStorage.getItem('access_token');
+        if (accessToken) {
+            config.headers.Authorization = `Bearer ${accessToken}`;
+        }
+        return config;
+    }, (error) => {
+        return Promise.reject(error);
+    });
 
-const notesAPI = axios.create({
-    baseURL: 'http://localhost:8000/notes/'
-})
+    apiInstance.interceptors.response.use((response) => {
+        return response;
+    }, async (error) => {
+        const originalRequest = error.config;
+        if (error.response.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true;
+            const refreshToken = localStorage.getItem('refresh_token');
+            try {
+                const response = await axios.post('http://localhost:8000/api/token/refresh/', {
+                    refresh: refreshToken,
+                });
+                localStorage.setItem('access_token', response.data.access);
+                axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.access}`;
+                return apiInstance(originalRequest);
+            } catch (refreshError) {
+                console.error('Error refreshing token:', refreshError);
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('refresh_token');
+                // Go to Login page
+                window.location.href = '/';
+            }
+        }
+        return Promise.reject(error);
+    });
+    return apiInstance;
+};
 
-const plotAPI = axios.create({
-    baseURL: 'http://localhost:8000/plot/'
-})
-
-const salesAPI = axios.create({
-    baseURL: 'http://localhost:8000/sale/'
-})
-
-const installmentAPI = axios.create({
-    baseURL: 'http://localhost:8000/installment/'
-})
-
-const commissionAPI = axios.create({
-    baseURL: 'http://localhost:8000/commission/'
-})
-
-const penaltyAPI = axios.create({
-    baseURL: 'http://localhost:8000/penalty/'
-})
-
-const penaltyHistoryAPI = axios.create({
-    baseURL: 'http://localhost:8000/penalty_history/'
-})
-
-const penaltyPaymentAPI = axios.create({
-    baseURL: 'http://localhost:8000/penalty_payments/'
-})
-
-const pdfInfoAPI = axios.create({
-    baseURL: 'http://localhost:8000/pdfinfo/'
-})
+const customerAPI = createAPIInstance('http://localhost:8000/customer/');
+const personalAPI = createAPIInstance('http://localhost:8000/personal/');
+const notesAPI = createAPIInstance('http://localhost:8000/notes/');
+const plotAPI = createAPIInstance('http://localhost:8000/plot/');
+const salesAPI = createAPIInstance('http://localhost:8000/sale/');
+const installmentAPI = createAPIInstance('http://localhost:8000/installment/');
+const commissionAPI = createAPIInstance('http://localhost:8000/commission/');
+const penaltyAPI = createAPIInstance('http://localhost:8000/penalty/');
+const penaltyHistoryAPI = createAPIInstance('http://localhost:8000/penalty_history/');
+const penaltyPaymentAPI = createAPIInstance('http://localhost:8000/penalty_payments/');
+const pdfInfoAPI = createAPIInstance('http://localhost:8000/pdfinfo/');
 
 // Customer
 export const getAllCustomers = () => {
