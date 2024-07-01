@@ -5,7 +5,6 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 
 
@@ -156,13 +155,3 @@ class PDFInformation(models.Model):
     phone_number_two_company = models.CharField(max_length=1, choices=TYPE_CHOICES)
     backup_email = models.EmailField(max_length=255, blank=False)
     app_password = models.CharField(max_length=256)
-
-    def save(self, *args, **kwargs):
-        # Encrypt your password if it's new or changed
-        if self.pk is None:  # New object
-            self.app_password = make_password(self.app_password)
-        else:
-            old_instance = PDFInformation.objects.get(pk=self.pk)
-            if self.app_password != old_instance.app_password:
-                self.app_password = make_password(self.app_password)
-        super().save(*args, **kwargs)
