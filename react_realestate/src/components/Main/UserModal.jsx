@@ -284,6 +284,7 @@ export default function UserModal({ isOpen, onOpenChange, updateTable, reloadDat
                                                 name="email"
                                                 control={control}
                                                 rules={{
+                                                    required: value === 'Personal' ? true : false,
                                                     pattern: {
                                                         value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i
                                                     }
