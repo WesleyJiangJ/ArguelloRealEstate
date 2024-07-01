@@ -105,7 +105,7 @@ def export_database(request):
 
 
 @csrf_exempt
-@api_view(['POST'])
+@api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def import_database(request):
     if request.method == "POST" and request.FILES.get("database"):
@@ -133,10 +133,11 @@ def import_database(request):
 
 def send_database():
     try:
+        info = PDFInformation.objects.get(pk=1)
         DATABASE_PATH = os.path.join(settings.BASE_DIR, "db.sqlite3")
-        EMAIL_USER = "example@gmail.com"
-        EMAIL_PASSWORD = "password"
-        RECIPIENT_EMAIL = "example@gmail.com"
+        EMAIL_USER = info.backup_email
+        EMAIL_PASSWORD = info.app_password
+        RECIPIENT_EMAIL = info.backup_email
 
         # Create email
         msg = MIMEMultipart()
