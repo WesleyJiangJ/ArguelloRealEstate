@@ -47,7 +47,7 @@ class Personal(models.Model):
     birthdate = models.DateField()
     dni = models.CharField(max_length=16, validators=[MinLengthValidator(16)])
     phone_number = models.CharField(max_length=8)
-    email = models.EmailField(max_length=255, blank=True)
+    email = models.EmailField(max_length=255, blank=False)
     note = GenericRelation(Notes)
     status = models.BooleanField(default=True)
     modified_at = models.DateTimeField(auto_now=True)
