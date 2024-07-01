@@ -3,11 +3,14 @@ import { useForm, Controller } from "react-hook-form"
 import { Tabs, Tab, Input, Select, SelectItem, Button } from "@nextui-org/react";
 import { sweetAlert, sweetToast } from "./Alert";
 import { getPDFInformation, patchPDFInformation, downloadDatabase, handleFileUpload } from "../../api/apiFunctions";
-import { PlusIcon, ArrowUpTrayIcon } from '@heroicons/react/24/solid'
+import { PlusIcon, ArrowUpTrayIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid'
 
 export default function Settings() {
     const [file, setFile] = React.useState(null);
+    const [isVisiblePassword, setIsVisiblePassword] = React.useState(false);
+    const toggleVisibility = () => setIsVisiblePassword(!isVisiblePassword);
     const [prevData, setPrevData] = React.useState({});
+    const [prevDataBackup, setPrevDataBackup] = React.useState({});
     const { control, handleSubmit, formState: { errors }, reset } = useForm({
         defaultValues: {
             name: '',
@@ -16,6 +19,12 @@ export default function Settings() {
             phone_number_one_company: 0,
             phone_number_two: '',
             phone_number_two_company: 0
+        }
+    });
+    const { control: controlBackup, handleSubmit: handleSubmitBackup, formState: { errors: errorsBackup }, reset: resetBackup } = useForm({
+        defaultValues: {
+            backup_email: '',
+            app_password: ''
         }
     });
 
@@ -27,6 +36,8 @@ export default function Settings() {
         const res = (await getPDFInformation(1)).data;
         reset({ ...res });
         setPrevData({ ...res });
+        resetBackup({ backup_email: res.backup_email, app_password: res.app_password });
+        setPrevDataBackup({ backup_email: res.backup_email, app_password: res.app_password });
     }
 
     const onSubmit = async (data) => {
@@ -50,6 +61,28 @@ export default function Settings() {
                 }
                 else if (key === 'phone_number_two_company') {
                     changes.add("compañía telefónica");
+                }
+            }
+        }
+        if (changes.size > 0) {
+            await sweetAlert("¿Confirmar cambios?", `¿Deseas modificar ${Array.from(changes).join(', ')}?`, "warning", "success", "Datos Actualizados");
+            await patchPDFInformation(1, data);
+            loadData();
+        }
+        else {
+            sweetToast('warning', 'No se realizaron modificaciones');
+        }
+    }
+
+    const onSubmitBackup = async (data) => {
+        let changes = new Set();
+        for (const key in prevDataBackup) {
+            if (prevDataBackup[key] !== data[key]) {
+                if (key === "backup_email") {
+                    changes.add("correo");
+                }
+                else if (key === "app_password") {
+                    changes.add("contraseña");
                 }
             }
         }
@@ -102,6 +135,54 @@ export default function Settings() {
                                 </Button>
                             </div>
                         </div>
+                    </Tab>
+                    <Tab key="backup" title="Backup" className="flex flex-col gap-2">
+                        <form onSubmit={handleSubmitBackup(onSubmitBackup)}>
+                            <Controller
+                                name="backup_email"
+                                control={controlBackup}
+                                rules={{
+                                    required: true,
+                                    pattern: {
+                                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i
+                                    }
+                                }}
+                                render={({ field }) => (
+                                    <Input
+                                        {...field}
+                                        variant="underlined"
+                                        label='Correo'
+                                        type="email"
+                                        isInvalid={errorsBackup.email ? true : false}
+                                    />
+                                )}
+                            />
+                            <Controller
+                                name="app_password"
+                                control={controlBackup}
+                                rules={{ required: true }}
+                                render={({ field }) => (
+                                    <Input
+                                        {...field}
+                                        label='Contraseñas de aplicaciones'
+                                        variant="underlined"
+                                        type={isVisiblePassword ? "text" : "password"}
+                                        isInvalid={errorsBackup.app_password ? true : false}
+                                        maxLength={20}
+                                        endContent={
+                                            <Button className="focus:outline-none bg-white" type="button" isIconOnly onClick={toggleVisibility}>
+                                                {isVisiblePassword ? (
+                                                    <EyeIcon className="w-5 h-5" />
+                                                ) : (
+                                                    <EyeSlashIcon className="w-5 h-5" />
+                                                )}
+                                            </Button>
+                                        }
+                                    />
+                                )}
+                            />
+                            <Button color="primary" size="lg" radius="sm" type="submit" fullWidth className="my-2">Guardar</Button>
+                        </form>
                     </Tab>
                     <Tab key="PDFInfo" title="PDF" className="flex flex-col gap-2">
                         <form onSubmit={handleSubmit(onSubmit)}>
