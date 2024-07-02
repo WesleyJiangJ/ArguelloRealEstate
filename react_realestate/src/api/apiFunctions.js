@@ -47,6 +47,7 @@ const createAPIInstance = (baseURL) => {
     return apiInstance;
 };
 
+const userAPI = createAPIInstance('http://localhost:8000/user/');
 const customerAPI = createAPIInstance('http://localhost:8000/customer/');
 const personalAPI = createAPIInstance('http://localhost:8000/personal/');
 const notesAPI = createAPIInstance('http://localhost:8000/notes/');
@@ -58,6 +59,15 @@ const penaltyAPI = createAPIInstance('http://localhost:8000/penalty/');
 const penaltyHistoryAPI = createAPIInstance('http://localhost:8000/penalty_history/');
 const penaltyPaymentAPI = createAPIInstance('http://localhost:8000/penalty_payments/');
 const pdfInfoAPI = createAPIInstance('http://localhost:8000/pdfinfo/');
+
+// User
+export const getUser = (email) => {
+    return userAPI.get(`?email=${email}`);
+}
+
+export const patchUser = (id, data) => {
+    return userAPI.patch(`/${id}/`, data);
+}
 
 // Customer
 export const getAllCustomers = () => {
