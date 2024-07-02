@@ -2,7 +2,7 @@ import React from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from "react-hook-form"
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Link } from "@nextui-org/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Link, useDisclosure } from "@nextui-org/react";
 import { UserIcon, LockClosedIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import Login from '../../assets/images/login.jpg'
 
@@ -94,7 +94,7 @@ export default function LoginModal({ isOpen, onOpenChange }) {
                                         )}
                                     />
                                     <div className="flex py-2 px-1 justify-end">
-                                        <Link color="primary" href="#" size="sm">
+                                        <Link color="primary" size="sm" className='cursor-pointer' onPress={() => navigate('/password-reset')}>
                                             ¿Olvidaste la contraseña?
                                         </Link>
                                     </div>
