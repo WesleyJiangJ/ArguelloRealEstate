@@ -94,9 +94,9 @@ class Commission(models.Model):
 
 class Sale(models.Model):
     STATUS_CHOICES = [(0, "Active"), (1, "Completed"), (2, "Cancelled")]
-    id_customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    id_personal = models.ForeignKey(Personal, on_delete=models.CASCADE)
-    id_plot = models.ForeignKey(Plot, on_delete=models.CASCADE)
+    id_customer = models.ForeignKey(Customer, on_delete=models.CASCADE, limit_choices_to={"status": True})
+    id_personal = models.ForeignKey(Personal, on_delete=models.CASCADE, limit_choices_to={"status": True})
+    id_plot = models.ForeignKey(Plot, on_delete=models.CASCADE, limit_choices_to={"status": 0})
     price = models.DecimalField(max_digits=10, decimal_places=2)
     premium = models.DecimalField(max_digits=10, decimal_places=2)
     installments = models.PositiveIntegerField()
@@ -114,7 +114,7 @@ class Sale(models.Model):
 
 class Installment(models.Model):
     TYPE_CHOICES = [(0, "Premium"), (1, "Installment")]
-    id_sale = models.ForeignKey(Sale, on_delete=models.CASCADE)
+    id_sale = models.ForeignKey(Sale, on_delete=models.CASCADE, limit_choices_to={"status": 0})
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     payment_type = models.CharField(max_length=1, choices=TYPE_CHOICES)
     note = GenericRelation(Notes)
