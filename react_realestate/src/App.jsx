@@ -12,7 +12,10 @@ import PDF from './components/Main/PDF';
 import Settings from './components/Main/Settings';
 import PlotModal from './components/Main/PlotModal'
 
-function App() {
+import PasswordResetRequest from './components/Login/PasswordResetRequest';
+import PasswordResetConfirm from './components/Login/PasswordResetConfirm';
+
+export default function App() {
   const mainData = {
     titles: {
       customer: 'Clientes',
@@ -27,6 +30,8 @@ function App() {
       <MainContext.Provider value={mainData}>
         <Routes>
           <Route path='/' element={<Login />} />
+          <Route path="/password-reset" element={<PasswordResetRequest />} />
+          <Route path="/password_reset_confirm/:uidb64/:token" element={<PasswordResetConfirm />} />
           <Route path='/main/*' element={<Main />}>
             <Route path='customer/*' element={<Customer />} />
             <Route path='customer/detail/:id' element={<Detail value={"Clientes"} />} />
@@ -45,5 +50,3 @@ function App() {
     </>
   )
 }
-
-export default App
