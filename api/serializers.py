@@ -1,4 +1,10 @@
 from django.contrib.auth.models import User
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes
+from django.core.mail import send_mail
+from django.conf import settings
+from django.urls import reverse
 from rest_framework import serializers
 from api.models import *
 
@@ -95,3 +101,61 @@ class PDFInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = PDFInformation
         fields = "__all__"
+
+
+class PasswordResetSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate_email(self, value):
+        try:
+            User.objects.get(email=value)
+        except User.DoesNotExist:
+            raise serializers.ValidationError("No user found with this email.")
+        return value
+
+    def save(self, reset_url=None):
+        email = self.validated_data["email"]
+        user = User.objects.get(email=email)
+
+        token = default_token_generator.make_token(user)
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+        # Use reset_url if provided, otherwise construct a default URL
+        if not reset_url:
+            reset_path = reverse(
+                "password_reset_confirm", kwargs={"uidb64": uid, "token": token}
+            )
+            # Remove the initial '/api/' from the URL
+            reset_path = reset_path.replace("/api/", "/", 1)
+            # Modify this with your desired base URL
+            reset_url = f"{settings.CORS_ALLOWED_ORIGINS[0]}{reset_path}"
+
+        send_mail(
+            "Recuperar Contraseña - Bienes Raices Arguello",
+            f"Use este enlace para restablecer su contraseña de {email}:\n{reset_url}",
+            settings.DEFAULT_FROM_EMAIL,
+            [user.email],
+        )
+
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    new_password = serializers.CharField(write_only=True)
+    confirm_password = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        if data["new_password"] != data["confirm_password"]:
+            raise serializers.ValidationError("Passwords do not match.")
+        return data
+
+    def save(self, uidb64, token):
+        try:
+            user_id = urlsafe_base64_decode(uidb64).decode()
+            user = User.objects.get(pk=user_id)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            raise serializers.ValidationError("Invalid token or user ID.")
+
+        if not default_token_generator.check_token(user, token):
+            raise serializers.ValidationError("Invalid token.")
+
+        user.set_password(self.validated_data["new_password"])
+        user.save()
