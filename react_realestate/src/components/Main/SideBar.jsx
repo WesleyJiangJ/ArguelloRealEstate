@@ -33,22 +33,22 @@ export default function SideBar({ collapsed }) {
                         Clientes
                     </MenuItem>
                     <MenuItem
+                        icon={<BanknotesIcon className="h-5 w-5" />}
+                        component={<NavLink to="sales" style={getActiveStyles} />}>
+                        Ventas
+                    </MenuItem>
+                    <MenuItem
                         icon={<Squares2X2Icon className="h-5 w-5" />}
                         component={<NavLink to="plot" style={getActiveStyles} />}>
                         Lotes
                     </MenuItem>
                     <MenuItem
-                        icon={<BanknotesIcon className="h-5 w-5" />}
-                        component={<NavLink to="sales" style={getActiveStyles} />}>
-                        Ventas
-                    </MenuItem>
-                </Menu>
-                <Menu menuItemStyles={menuItemStyles}>
-                    <MenuItem
                         icon={<UserGroupIcon className="h-5 w-5" />}
                         component={<NavLink to="personal" style={getActiveStyles} />}>
                         Personal
                     </MenuItem>
+                </Menu>
+                <Menu menuItemStyles={menuItemStyles}>
                     <MenuItem
                         icon={<CogIcon className="h-5 w-5" />}
                         component={<NavLink to="settings" style={getActiveStyles} />}>
