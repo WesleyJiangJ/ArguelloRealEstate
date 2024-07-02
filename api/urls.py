@@ -28,6 +28,8 @@ urlpatterns = [
     path("docs/", include_docs_urls(title="API")),
     path("export-database/", views.export_database, name="export-database"),
     path("import-database/", views.import_database, name="import-database"),
+    path('api/password_reset/', views.PasswordResetView.as_view(), name='password_reset'),
+    path('api/password_reset_confirm/<uidb64>/<token>/', views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
 ]
 
 urlpatterns += router.urls
