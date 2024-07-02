@@ -1,3 +1,4 @@
+import os
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -6,6 +7,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.urls import reverse
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from api.models import *
 
 
@@ -159,3 +161,38 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
 
         user.set_password(self.validated_data["new_password"])
         user.save()
+
+
+def set_env_variable(key, value):
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    env_file = os.path.join(BASE_DIR, "RealEstate", ".env")
+    lines = []
+    with open(env_file, "r") as f:
+        lines = f.readlines()
+
+    with open(env_file, "w") as f:
+        found = False
+        for line in lines:
+            if line.startswith(f"{key}="):
+                f.write(f"{key}={value}\n")
+                found = True
+            else:
+                f.write(line)
+        if not found:
+            f.write(f"{key}={value}\n")
+    os.environ[key] = value
+
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        try:
+            info = PDFInformation.objects.first()
+            user_email = info.backup_email
+            user_password = info.app_password
+            set_env_variable("EMAIL_HOST_USER", user_email)
+            set_env_variable("EMAIL_HOST_PASSWORD", user_password)
+        except PDFInformation.DoesNotExist:
+            pass
+        return token
