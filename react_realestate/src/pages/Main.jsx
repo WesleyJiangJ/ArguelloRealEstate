@@ -52,7 +52,7 @@ export default function Main() {
                             <p className='flex items-center justify-center'>{getTitle()}</p>
                         </div>
                         <div className="mx-4 grow">
-                            <p className='flex items-center justify-end'>Profile</p>
+                            <p className='flex items-center justify-end'></p>
                         </div>
                     </div>
                     <div className='h-full p-2 overflow-auto'>
