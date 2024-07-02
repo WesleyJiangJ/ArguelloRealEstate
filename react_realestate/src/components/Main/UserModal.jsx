@@ -3,7 +3,7 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input
 import { useForm, Controller } from "react-hook-form"
 import { useParams } from "react-router-dom";
 import { getLocalTimeZone, today, parseDate } from "@internationalized/date";
-import { getSpecificCustomer, getSpecificPersonal, postCustomer, postPersonal, patchCustomer, patchPersonal } from "../../api/apiFunctions";
+import { getSpecificCustomer, getSpecificPersonal, postCustomer, postPersonal, patchCustomer, patchPersonal, patchUser, getUser } from "../../api/apiFunctions";
 import { sweetAlert, sweetToast } from "./Alert";
 
 export default function UserModal({ isOpen, onOpenChange, updateTable, reloadData, value }) {
@@ -112,7 +112,10 @@ export default function UserModal({ isOpen, onOpenChange, updateTable, reloadDat
                 }
                 else {
                     await patchPersonal(param.id, data)
-                        .then(() => {
+                        .then(async () => {
+                            const res = (await getUser(prevData['email'])).data;
+                            if (changes.has('correo')) await patchUser(res[0].id, { username: data.email, email: data.email })
+                            else if (changes.has('nombre')) await patchUser(res[0].id, { first_name: data.first_name, last_name: data.first_surname })
                             reloadData();
                             loadData();
                             onOpenChange(false);
