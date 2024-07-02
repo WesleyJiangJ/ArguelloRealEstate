@@ -1,16 +1,19 @@
 import os
 import smtplib
+from datetime import datetime
+from rest_framework.response import Response
+from rest_framework import generics
+from rest_framework.permissions import AllowAny
 from rest_framework import viewsets
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from datetime import datetime
+from django.conf import settings
 from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from django.conf import settings
 from api.serializers import *
 from api.models import *
 
@@ -18,6 +21,8 @@ from api.models import *
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["email"]
 
 
 class CustomerViewSet(viewsets.ModelViewSet):
@@ -173,3 +178,31 @@ def send_database():
 
     except Exception as e:
         return JsonResponse({"status": "error", "message": str(e)}, status=500)
+
+
+class PasswordResetView(generics.CreateAPIView):
+    permission_classes = [AllowAny]
+    serializer_class = PasswordResetSerializer
+
+
+class PasswordResetConfirmView(generics.CreateAPIView):
+    permission_classes = [AllowAny]
+    serializer_class = PasswordResetConfirmSerializer
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update(
+            {
+                "uidb64": self.kwargs["uidb64"],
+                "token": self.kwargs["token"],
+            }
+        )
+        return context
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(
+            data=request.data, context=self.get_serializer_context()
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save(uidb64=self.kwargs["uidb64"], token=self.kwargs["token"])
+        return Response("Password has been reset with the new password.")
