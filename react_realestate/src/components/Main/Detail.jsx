@@ -2,7 +2,7 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form"
 import { Card, CardHeader, CardBody, Button, Input, Textarea, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Tab, Tabs, useDisclosure } from "@nextui-org/react";
-import { getSpecificCustomer, patchCustomer, postNote, getNotes, getNote, deleteNote, getSpecificPersonal, patchPersonal, getSaleByUser, getCommissionByUser } from "../../api/apiFunctions"
+import { getSpecificCustomer, patchCustomer, postNote, getNotes, getNote, deleteNote, getSpecificPersonal, patchPersonal, getSaleByUser, getCommissionByUser, patchUser, getUser } from "../../api/apiFunctions"
 import { ChatBubbleOvalLeftEllipsisIcon, PlusIcon, ArrowPathIcon, TrashIcon } from "@heroicons/react/24/outline"
 import { sweetAlert, sweetToast } from "./Alert";
 import UserModal from "./UserModal"
@@ -71,7 +71,9 @@ export default function Detail({ value }) {
             }
             else {
                 await patchPersonal(param.id, update_data)
-                    .then(() => {
+                    .then(async () => {
+                        const res = (await getUser(userData.email)).data;
+                        await patchUser(res[0].id, { is_active: update_data.status })
                         loadData();
                     })
                     .catch((error) => {
