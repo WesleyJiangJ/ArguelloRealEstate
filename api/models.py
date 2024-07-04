@@ -99,7 +99,7 @@ class Sale(models.Model):
     id_plot = models.ForeignKey(Plot, on_delete=models.CASCADE, limit_choices_to={"status": 0})
     price = models.DecimalField(max_digits=10, decimal_places=2)
     premium = models.DecimalField(max_digits=10, decimal_places=2)
-    installments = models.PositiveIntegerField()
+    installments = models.DecimalField(max_digits=8, decimal_places=2)
     total_paid = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     date_paid = models.DateField(blank=True, null=True)
     sale_commission = models.DecimalField(max_digits=5, decimal_places=2)
