@@ -114,7 +114,7 @@ class Sale(models.Model):
 
 class Installment(models.Model):
     TYPE_CHOICES = [(0, "Premium"), (1, "Installment")]
-    id_sale = models.ForeignKey(Sale, on_delete=models.CASCADE, limit_choices_to={"status": 0})
+    id_sale = models.ForeignKey(Sale, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     payment_type = models.CharField(max_length=1, choices=TYPE_CHOICES)
     note = GenericRelation(Notes)
