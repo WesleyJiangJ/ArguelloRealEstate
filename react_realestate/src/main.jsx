@@ -6,11 +6,9 @@ import { NextUIProvider } from '@nextui-org/react'
 import { BrowserRouter } from "react-router-dom";
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <NextUIProvider locale="es-NI">
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </NextUIProvider>
-  </React.StrictMode>
+  <NextUIProvider locale="es-NI">
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </NextUIProvider>
 )
