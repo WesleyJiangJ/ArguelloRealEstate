@@ -23,12 +23,12 @@ class Notes(models.Model):
 
 class Customer(models.Model):
     first_name = models.CharField(max_length=30)
-    middle_name = models.CharField(max_length=30)
+    middle_name = models.CharField(max_length=30, blank=True)
     first_surname = models.CharField(max_length=30)
-    second_surname = models.CharField(max_length=30)
+    second_surname = models.CharField(max_length=30, blank=True)
     birthdate = models.DateField()
-    dni = models.CharField(max_length=16, validators=[MinLengthValidator(16)])
-    phone_number = models.CharField(max_length=8)
+    dni = models.CharField(max_length=16, unique=True, validators=[MinLengthValidator(16)])
+    phone_number = models.CharField(max_length=8, blank=True)
     email = models.EmailField(max_length=255, blank=True)
     note = GenericRelation(Notes)
     status = models.BooleanField(default=True)
@@ -94,9 +94,9 @@ class Commission(models.Model):
 
 class Sale(models.Model):
     STATUS_CHOICES = [(0, "Active"), (1, "Completed"), (2, "Cancelled")]
-    id_customer = models.ForeignKey(Customer, on_delete=models.CASCADE, limit_choices_to={"status": True})
-    id_personal = models.ForeignKey(Personal, on_delete=models.CASCADE, limit_choices_to={"status": True})
-    id_plot = models.ForeignKey(Plot, on_delete=models.CASCADE, limit_choices_to={"status": 0})
+    id_customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    id_personal = models.ForeignKey(Personal, on_delete=models.CASCADE)
+    id_plot = models.ForeignKey(Plot, on_delete=models.CASCADE)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     premium = models.DecimalField(max_digits=10, decimal_places=2)
     installments = models.DecimalField(max_digits=8, decimal_places=2)
