@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { getAllPlots } from "../../api/apiFunctions";
-import { Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Select, SelectItem, Input, Chip, useDisclosure } from "@nextui-org/react";
+import { Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Select, SelectItem, Input, Chip, useDisclosure, Spinner } from "@nextui-org/react";
 import { PlusIcon } from "@heroicons/react/24/solid"
 import PlotModal from "./PlotModal";
 
@@ -9,6 +9,7 @@ export default function Plot() {
     const navigate = useNavigate();
     const param = useParams();
     const location = useLocation();
+    const [isLoading, setIsLoading] = React.useState(true);
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const [plot, setPlot] = React.useState([]);
     const [searchValue, setSearchValue] = React.useState("");
@@ -28,6 +29,7 @@ export default function Plot() {
     const loadPlots = async () => {
         setPlot((await getAllPlots()).data);
         modifyURL();
+        setIsLoading(false);
     }
 
     const modifyURL = () => {
@@ -91,73 +93,81 @@ export default function Plot() {
     }, []);
 
     return (
-        <div className="flex flex-col h-full">
-            <div className="flex flex-row gap-2">
-                <div className='w-full'>
-                    <Input
-                        type="text"
-                        label="Buscar"
-                        radius='sm'
-                        value={searchValue}
-                        onChange={(e) => setSearchValue(e.target.value)}
-                    />
+        <>
+            {isLoading ? (
+                <div className="flex items-center justify-center w-full h-full">
+                    <Spinner size="lg" />
                 </div>
-                <div>
-                    <Select
-                        label="Filtrar"
-                        onChange={filter}
-                        defaultSelectedKeys={'3'}
-                        className="w-28 md:w-32"
+            ) : (
+                <div className="flex flex-col h-full">
+                    <div className="flex flex-row gap-2">
+                        <div className='w-full'>
+                            <Input
+                                type="text"
+                                label="Buscar"
+                                radius='sm'
+                                value={searchValue}
+                                onChange={(e) => setSearchValue(e.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <Select
+                                label="Filtrar"
+                                onChange={filter}
+                                defaultSelectedKeys={'3'}
+                                className="w-28 md:w-32"
+                                radius="sm"
+                                disallowEmptySelection>
+                                <SelectItem key={3} value={3}>Todos</SelectItem>
+                                <SelectItem key={0} value={0}>Disponible</SelectItem>
+                                <SelectItem key={1} value={1}>Proceso</SelectItem>
+                                <SelectItem key={2} value={2}>Vendido</SelectItem>
+                            </Select>
+                        </div>
+                        <div>
+                            <Button
+                                radius='sm'
+                                color="primary"
+                                className='p-3 h-full w-full'
+                                isIconOnly
+                                onPress={onOpen}>
+                                <PlusIcon className="h-7 w-7" />
+                            </Button>
+                        </div>
+                    </div>
+                    <span className="text-default-500 text-small my-2">Lotes: {plot.length}</span>
+                    <Table
+                        aria-label="Plot Table"
                         radius="sm"
-                        disallowEmptySelection>
-                        <SelectItem key={3} value={3}>Todos</SelectItem>
-                        <SelectItem key={0} value={0}>Disponible</SelectItem>
-                        <SelectItem key={1} value={1}>Proceso</SelectItem>
-                        <SelectItem key={2} value={2}>Vendido</SelectItem>
-                    </Select>
+                        selectionMode="single"
+                        shadow="none"
+                        className="flex-grow overflow-auto"
+                        onRowAction={(key) => {
+                            navigate(`detail/${key}`);
+                            onOpenChange(true);
+                        }}>
+                        <TableHeader columns={columns}>
+                            {(column) => (
+                                <TableColumn key={column.uid}>
+                                    {column.name}
+                                </TableColumn>
+                            )}
+                        </TableHeader>
+                        <TableBody emptyContent={"No hubieron resultados"} items={filteredPlots}>
+                            {(item) => (
+                                <TableRow key={item.id}>
+                                    {(columnKey) =>
+                                        <TableCell className="cursor-pointer">
+                                            {renderCell(item, columnKey)}
+                                        </TableCell>
+                                    }
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                    <PlotModal isOpen={isOpen} onOpenChange={onOpenChange} loadPlot={loadPlots} param={param} modifyURL={modifyURL} />
                 </div>
-                <div>
-                    <Button
-                        radius='sm'
-                        color="primary"
-                        className='p-3 h-full w-full'
-                        isIconOnly
-                        onPress={onOpen}>
-                        <PlusIcon className="h-7 w-7" />
-                    </Button>
-                </div>
-            </div>
-            <span className="text-default-500 text-small my-2">Lotes: {plot.length}</span>
-            <Table
-                aria-label="Plot Table"
-                radius="sm"
-                selectionMode="single"
-                shadow="none"
-                className="flex-grow overflow-auto"
-                onRowAction={(key) => {
-                    navigate(`detail/${key}`);
-                    onOpenChange(true);
-                }}>
-                <TableHeader columns={columns}>
-                    {(column) => (
-                        <TableColumn key={column.uid}>
-                            {column.name}
-                        </TableColumn>
-                    )}
-                </TableHeader>
-                <TableBody emptyContent={"No hubieron resultados"} items={filteredPlots}>
-                    {(item) => (
-                        <TableRow key={item.id}>
-                            {(columnKey) =>
-                                <TableCell className="cursor-pointer">
-                                    {renderCell(item, columnKey)}
-                                </TableCell>
-                            }
-                        </TableRow>
-                    )}
-                </TableBody>
-            </Table>
-            <PlotModal isOpen={isOpen} onOpenChange={onOpenChange} loadPlot={loadPlots} param={param} modifyURL={modifyURL} />
-        </div>
+            )}
+        </>
     )
 }

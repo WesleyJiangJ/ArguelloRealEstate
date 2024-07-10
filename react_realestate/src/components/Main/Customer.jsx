@@ -1,9 +1,11 @@
 import React from "react";
 import Table from "./Table";
+import { Spinner } from "@nextui-org/react";
 import { getAllCustomers } from "../../api/apiFunctions";
 
 export default function Customer() {
     const [customerData, setCustomerData] = React.useState([]);
+    const [isLoading, setIsLoading] = React.useState(true);
     const INITIAL_VISIBLE_COLUMNS = ["full_name", "status"];
     const columns = [
         { name: "Nombres", uid: "full_name", sortable: true },
@@ -44,6 +46,7 @@ export default function Customer() {
     const fetchData = async () => {
         try {
             setCustomerData((await getAllCustomers()).data);
+            setIsLoading(false);
         } catch (error) {
             console.error("Error fetching data:", error);
         }
@@ -53,22 +56,28 @@ export default function Customer() {
     }, []);
     return (
         <>
-            <Table
-                value={"Clientes"}
-                showStatusDropdown={true}
-                showColumnsDropdown={true}
-                showAddButton={true}
-                typeOfData={"Usuarios"}
-                axiosResponse={customerData}
-                fetchData={fetchData}
-                INITIAL_VISIBLE_COLUMNS={INITIAL_VISIBLE_COLUMNS}
-                columns={columns}
-                statusColorMap={statusColorMap}
-                statusOptions={statusOptions}
-                statusFilterDefaultValue={true.toString()}
-                cellValues={cellValues}
-                sortedItem={sortedItem}
-            />
+            {isLoading ? (
+                <div className="flex items-center justify-center w-full h-full">
+                    <Spinner size="lg" />
+                </div>
+            ) : (
+                <Table
+                    value={"Clientes"}
+                    showStatusDropdown={true}
+                    showColumnsDropdown={true}
+                    showAddButton={true}
+                    typeOfData={"Usuarios"}
+                    axiosResponse={customerData}
+                    fetchData={fetchData}
+                    INITIAL_VISIBLE_COLUMNS={INITIAL_VISIBLE_COLUMNS}
+                    columns={columns}
+                    statusColorMap={statusColorMap}
+                    statusOptions={statusOptions}
+                    statusFilterDefaultValue={true.toString()}
+                    cellValues={cellValues}
+                    sortedItem={sortedItem}
+                />
+            )}
         </>
     );
 }
