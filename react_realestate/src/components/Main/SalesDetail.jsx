@@ -62,16 +62,7 @@ export default function SalesDetail() {
                 setIsLoading(false);
             }
 
-            const saleDate = new Date(saleData.date_paid);
-            const currentDate = new Date();
-            // const currentDate = new Date('2024-12-02');
-            // Extract the month and year from the date of the sale and the current date
-            const saleMonth = saleDate.getMonth();
-            const saleYear = saleDate.getFullYear();
-            const currentMonth = currentDate.getMonth();
-            const currentYear = currentDate.getFullYear();
-
-            if (saleYear < currentYear || (saleYear === currentYear && saleMonth < currentMonth)) {
+            if (saleData.status === 0) {
                 if (saleData.date_paid !== null) {
                     penalty(saleData);
                 }
@@ -85,6 +76,7 @@ export default function SalesDetail() {
     const penalty = async (data) => {
         const last_date = new Date(data.date_paid);
         const current_date = new Date();
+        last_date.setDate(last_date.getDate() + 1);
         // const current_date = new Date('2024-10-02');
         const years = current_date.getFullYear() - last_date.getFullYear();
         const months = current_date.getMonth() - last_date.getMonth();
