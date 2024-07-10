@@ -8,7 +8,7 @@ import { sweetAlert, sweetToast } from "./Alert";
 
 export default function UserModal({ isOpen, onOpenChange, updateTable, reloadData, value }) {
     const param = useParams();
-    const { control, handleSubmit, formState: { errors }, reset } = useForm({
+    const { control, handleSubmit, formState: { errors }, reset, setError } = useForm({
         defaultValues: {
             first_name: '',
             middle_name: '',
@@ -61,6 +61,10 @@ export default function UserModal({ isOpen, onOpenChange, updateTable, reloadDat
                         reset();
                     })
                     .catch((error) => {
+                        if (error.response.status === 400 && error.response.data.dni[0] === 'Ya existe customer con este dni.') {
+                            setError('dni');
+                            sweetToast('error', 'El número de cédula ya existe');
+                        }
                         console.error('Error: ', error);
                     })
             }
@@ -175,7 +179,6 @@ export default function UserModal({ isOpen, onOpenChange, updateTable, reloadDat
                                             <Controller
                                                 name="middle_name"
                                                 control={control}
-                                                rules={{ required: true }}
                                                 render={({ field }) => (
                                                     <Input
                                                         {...field}
@@ -207,7 +210,6 @@ export default function UserModal({ isOpen, onOpenChange, updateTable, reloadDat
                                                 name="second_surname"
                                                 control={control}
                                                 rules={{
-                                                    required: true,
                                                     validate: value => !value.includes(' ')
                                                 }}
                                                 render={({ field }) => (
@@ -260,7 +262,6 @@ export default function UserModal({ isOpen, onOpenChange, updateTable, reloadDat
                                                 name="phone_number"
                                                 control={control}
                                                 rules={{
-                                                    required: true,
                                                     minLength: 8,
                                                     maxLength: 8,
                                                     pattern: {
