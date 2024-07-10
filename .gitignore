@@ -1,5 +1,6 @@
 .venv
 .env
+extra.py
 db.sqlite3
 .DS_Store
 migrations
