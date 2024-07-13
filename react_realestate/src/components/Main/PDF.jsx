@@ -71,8 +71,16 @@ export default function PDF() {
         setInstallment((await getAllInstallmentByCustomer(res.customer_data?.id, param.id)).data);
         const penalty = (await getPenalty(param.id)).data;
         if (penalty.length !== 0) {
-            setPenalty(penalty[0].total);
-            setShowPenalty(true);
+            if (parseInt(penalty[0].total) === 0) {
+                setShowPenalty(false);
+            }
+            else {
+                setPenalty(penalty[0].total);
+                setShowPenalty(true);
+            }
+        }
+        else if (penalty.length === 0) {
+            setShowPenalty(false);
         }
         setIsLoading(false);
     }
