@@ -46,7 +46,7 @@ export default function Detail({ value }) {
             const commissions = (await getCommissionByUser(param.id)).data;
             setCommission(commissions);
             setTotalCommission(commissions.reduce((total, item) => total + parseFloat(item.amount), 0));
-            setValue('content_type', 9);
+            setValue('content_type', 10);
             setIsLoading(false);
         }
     }
@@ -394,7 +394,7 @@ export default function Detail({ value }) {
                                                                 await deleteNote(noteID)
                                                                     .then(() => {
                                                                         loadData();
-                                                                        reset({ name: '', content: '', object_id: parseInt(param.id), content_type: value === 'customer' ? 7 : 9 });
+                                                                        reset({ name: '', content: '', object_id: parseInt(param.id), content_type: value === 'customer' ? 7 : 10 });
                                                                         setNoteID('');
                                                                     })
                                                                     .catch((error) => {
@@ -410,7 +410,7 @@ export default function Detail({ value }) {
                                                             radius="sm"
                                                             size="sm"
                                                             onClick={() => {
-                                                                reset({ name: '', content: '', object_id: parseInt(param.id), content_type: value === 'customer' ? 7 : 9 });
+                                                                reset({ name: '', content: '', object_id: parseInt(param.id), content_type: value === 'customer' ? 7 : 10 });
                                                                 setNoteID('');
                                                             }}>
                                                             <ArrowPathIcon className="w-5 h-5" />

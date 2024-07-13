@@ -231,8 +231,7 @@ export default function SalesModal({ isOpen, onOpenChange, updateTable }) {
                                                         {...field}
                                                         label={'Cantidad de Cuotas'}
                                                         variant="underlined"
-                                                        type="number"
-                                                        min={1}
+                                                        maxLength={6}
                                                         isReadOnly={watch('premium') === '' || watch('premium') < 0}
                                                         isInvalid={errors.installments ? true : false}
                                                         onChange={(e) => {
@@ -242,7 +241,7 @@ export default function SalesModal({ isOpen, onOpenChange, updateTable }) {
                                                                 setEachInstallment('');
                                                             }
                                                             else {
-                                                                setEachInstallment(parseFloat(watch('debt')) / parseInt(e.target.value));
+                                                                setEachInstallment(parseFloat(watch('debt')) / parseFloat(e.target.value));
                                                                 clearErrors('installments');
                                                             }
                                                         }}
@@ -276,7 +275,7 @@ export default function SalesModal({ isOpen, onOpenChange, updateTable }) {
                                                         variant="underlined"
                                                         placeholder="0.00"
                                                         endContent={'%'}
-                                                        type="number"
+                                                        maxLength={6}
                                                         isInvalid={errors.sale_commission ? true : false}
                                                         onChange={(e) => {
                                                             field.onChange(e);
@@ -309,6 +308,7 @@ export default function SalesModal({ isOpen, onOpenChange, updateTable }) {
                                                         variant="underlined"
                                                         placeholder="0.00"
                                                         endContent={'%'}
+                                                        maxLength={6}
                                                         isInvalid={errors.penalty_commission ? true : false}
                                                         onChange={(e) => {
                                                             field.onChange(e);

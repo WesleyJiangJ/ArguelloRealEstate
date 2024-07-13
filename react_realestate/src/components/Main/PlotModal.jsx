@@ -13,7 +13,7 @@ export default function PlotModal({ isOpen, onOpenChange, loadPlot, param, modif
             notes: {
                 id: '',
                 content: '',
-                content_type: 10,
+                content_type: 11,
                 object_id: ''
             },
             status: 0
@@ -34,7 +34,7 @@ export default function PlotModal({ isOpen, onOpenChange, loadPlot, param, modif
             // Check if resNotes has values
             const note = resNote && resNote.length > 0
                 ? resNote[0]
-                : { id: '', content: '', content_type: 10, object_id: '' };
+                : { id: '', content: '', content_type: 11, object_id: '' };
 
             reset({
                 ...res,
@@ -69,7 +69,7 @@ export default function PlotModal({ isOpen, onOpenChange, loadPlot, param, modif
             notes: {
                 id: '',
                 content: '',
-                content_type: 10,
+                content_type: 11,
                 object_id: ''
             },
             status: 0
@@ -157,7 +157,7 @@ export default function PlotModal({ isOpen, onOpenChange, loadPlot, param, modif
                         if (watch('notes.content').length > 0) {
                             if (response.status === 201) {
                                 data.notes.object_id = response.data.id;
-                                data.notes.content_type = 10;
+                                data.notes.content_type = 11;
                                 await postNote(data.notes)
                                     .then(() => {
                                         sweetToast("success", `Se agregó el lote N°${data.number}`);
