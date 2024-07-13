@@ -202,6 +202,10 @@ export const getPenaltyHistory = (id) => {
     return penaltyHistoryAPI.get(`?id_penalty=${id}`);
 }
 
+export const deletePenaltyHistory = (id) => {
+    return penaltyHistoryAPI.delete(`/${id}/`);
+}
+
 // Penalty Payments
 export const postPenaltyPayment = (data) => {
     return penaltyPaymentAPI.post('/', data);
