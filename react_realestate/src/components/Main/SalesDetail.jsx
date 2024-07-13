@@ -2,7 +2,7 @@ import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form"
 import { Card, CardHeader, CardBody, Button, Input, Textarea, DatePicker, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Spinner, useDisclosure } from "@nextui-org/react";
-import { getAllInstallmentByCustomer, getNote, getNotes, getSpecificSale, postInstallment, postNote, deleteNote, patchSale, patchPlot, postCommission, postPenalty, getPenalty, postPenaltyHistory, getPenaltyHistory, patchPenalty, getPenaltyPayment } from "../../api/apiFunctions"
+import { getAllInstallmentByCustomer, getNote, getNotes, getSpecificSale, postInstallment, postNote, deleteNote, patchSale, patchPlot, postCommission, postPenalty, getPenalty, postPenaltyHistory, getPenaltyHistory, patchPenalty, getPenaltyPayment, deletePenaltyHistory } from "../../api/apiFunctions"
 import { today } from "@internationalized/date";
 import { ChatBubbleOvalLeftEllipsisIcon, PlusIcon, ArrowPathIcon, TrashIcon } from "@heroicons/react/24/outline"
 import { sweetAlert, sweetToast } from "./Alert";
@@ -33,7 +33,7 @@ export default function SalesDetail() {
             name: '',
             content: '',
             object_id: parseInt(param.id),
-            content_type: 11
+            content_type: 12
         }
     });
 
@@ -140,6 +140,7 @@ export default function SalesDetail() {
                 penalty_sum += parseFloat(element['penalty']);
             })
 
+            // Check if has a new month that the customer doesn't paid
             if (newValues.length !== 0) {
                 newValues.map(async (element) => {
                     await postPenaltyHistory(
@@ -157,6 +158,7 @@ export default function SalesDetail() {
                                 totalPaidSum += parseFloat(element.amount);
                             })
                             const totalPost = (penalty_sum - totalPaidSum) + parseFloat(element.penalty);
+                            // Here we update the amount of the debt when a new month arrives, calculating the new debt total.
                             await patchPenalty(get_penalty[0].id, { total: parseFloat(totalPost).toFixed(2) })
                         })
                         .catch(error => console.log(error))
@@ -188,6 +190,7 @@ export default function SalesDetail() {
                 if (updateData.status === 1) {
                     await patchPlot(saleData.id_plot, { status: 2 });
                     await postCommission({ id_personal: saleData.id_personal, id_plot: saleData.id_plot, amount: (parseFloat(saleData.price) * (parseFloat(saleData.sale_commission) / 100)) });
+                    deleteAllPenaltyHistory();
                 }
                 sweetToast("success", `Se abonaron $${data.amount}`);
                 reset();
@@ -234,10 +237,21 @@ export default function SalesDetail() {
         await sweetAlert('¿Deseas anular la venta?', 'Esta acción es irreversible', 'question', 'success', 'Hecho');
         await patchSale(param.id, { status: 2 })
             .then(async () => {
-                await patchPlot(saleData.id_plot, { status: 0 })
+                deleteAllPenaltyHistory();
                 reset();
                 loadData();
             });
+    }
+
+    // When a sale is sold or cancelled, it delete all the penalty payment history,
+    // it doesn't delete the main record to keep how much money the customer owes.
+    const deleteAllPenaltyHistory = async () => {
+        const penalty = (await getPenalty(param.id)).data;
+        const penalty_history = (await getPenaltyHistory(penalty[0].id)).data;
+        await patchPlot(saleData.id_plot, { status: 0 })
+        for (let id of penalty_history) {
+            await deletePenaltyHistory(id.id);
+        }
     }
 
     return (
@@ -440,7 +454,7 @@ export default function SalesDetail() {
                                                                     variant="underlined"
                                                                     startContent={'$'}
                                                                     placeholder="0.00"
-                                                                    min={1}
+                                                                    maxLength={9}
                                                                     isInvalid={errors.amount ? true : false}
                                                                     onChange={(e) => {
                                                                         field.onChange(e);
@@ -545,7 +559,7 @@ export default function SalesDetail() {
                                                                         await deleteNote(noteID)
                                                                             .then(() => {
                                                                                 loadData();
-                                                                                resetNote({ name: '', content: '', object_id: parseInt(param.id), content_type: 11 });
+                                                                                resetNote({ name: '', content: '', object_id: parseInt(param.id), content_type: 12 });
                                                                                 setNoteID('');
                                                                             })
                                                                             .catch((error) => {
@@ -561,7 +575,7 @@ export default function SalesDetail() {
                                                                     radius="sm"
                                                                     size="sm"
                                                                     onClick={() => {
-                                                                        resetNote({ name: '', content: '', object_id: parseInt(param.id), content_type: 11 });
+                                                                        resetNote({ name: '', content: '', object_id: parseInt(param.id), content_type: 12 });
                                                                         setNoteID('');
                                                                     }}>
                                                                     <ArrowPathIcon className="w-5 h-5" />
