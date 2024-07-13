@@ -76,6 +76,10 @@ export default function UserModal({ isOpen, onOpenChange, updateTable, reloadDat
                         reset();
                     })
                     .catch((error) => {
+                        if (error.response.status === 400 && error.response.data.dni[0] === 'Ya existe personal con este dni.') {
+                            setError('dni');
+                            sweetToast('error', 'El número de cédula ya existe');
+                        }
                         console.error('Error: ', error);
                     })
             }
@@ -111,6 +115,10 @@ export default function UserModal({ isOpen, onOpenChange, updateTable, reloadDat
                             reset();
                         })
                         .catch((error) => {
+                            if (error.response.status === 400 && error.response.data.dni[0] === 'Ya existe customer con este dni.') {
+                                setError('dni');
+                                sweetToast('error', 'El número de cédula ya existe');
+                            }
                             console.error('Error: ', error);
                         })
                 }
@@ -126,6 +134,10 @@ export default function UserModal({ isOpen, onOpenChange, updateTable, reloadDat
                             reset();
                         })
                         .catch((error) => {
+                            if (error.response.status === 400 && error.response.data.dni[0] === 'Ya existe personal con este dni.') {
+                                setError('dni');
+                                sweetToast('error', 'El número de cédula ya existe');
+                            }
                             console.error('Error: ', error);
                         })
                 }
@@ -179,6 +191,9 @@ export default function UserModal({ isOpen, onOpenChange, updateTable, reloadDat
                                             <Controller
                                                 name="middle_name"
                                                 control={control}
+                                                rules={{
+                                                    required: value === 'Personal' ? true : false
+                                                }}
                                                 render={({ field }) => (
                                                     <Input
                                                         {...field}
@@ -210,6 +225,7 @@ export default function UserModal({ isOpen, onOpenChange, updateTable, reloadDat
                                                 name="second_surname"
                                                 control={control}
                                                 rules={{
+                                                    required: value === 'Personal' ? true : false,
                                                     validate: value => !value.includes(' ')
                                                 }}
                                                 render={({ field }) => (
@@ -262,6 +278,7 @@ export default function UserModal({ isOpen, onOpenChange, updateTable, reloadDat
                                                 name="phone_number"
                                                 control={control}
                                                 rules={{
+                                                    required: value === 'Personal' ? true : false,
                                                     minLength: 8,
                                                     maxLength: 8,
                                                     pattern: {
