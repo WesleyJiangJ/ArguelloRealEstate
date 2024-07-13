@@ -649,7 +649,14 @@ export default function SalesDetail() {
                                             <TableBody emptyContent={"No se encontraron notas"}>
                                                 {notes.map((note) =>
                                                     <TableRow key={note.id} className="cursor-pointer">
-                                                        {() => <TableCell>{note.name}</TableCell>}
+                                                        {() =>
+                                                            <TableCell>
+                                                                <div className="flex flex-col truncate max-w-sm md:max-w-md">
+                                                                    <p className="text-bold text-sm capitalize">{note.name}</p>
+                                                                    <p className="text-bold text-sm capitalize text-default-400">{note.content}</p>
+                                                                </div>
+                                                            </TableCell>
+                                                        }
                                                     </TableRow>
                                                 )}
                                             </TableBody>

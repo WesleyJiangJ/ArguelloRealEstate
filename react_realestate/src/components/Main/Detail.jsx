@@ -378,114 +378,127 @@ export default function Detail({ value }) {
                                     className="bg-card h-full"
                                     shadow="none">
                                     <form onSubmit={handleSubmit(onSubmit)}>
-                                        <CardHeader className="flex flex-row justify-between">
-                                            <h4 className="font-bold text-medium">Notas</h4>
-                                            <div className="flex gap-2">
-                                                {noteID.length > 0 &&
-                                                    <>
-                                                        <Button
-                                                            isIconOnly
-                                                            variant="light"
-                                                            color="danger"
-                                                            radius="sm"
-                                                            size="sm"
-                                                            onClick={async () => {
-                                                                await sweetAlert('¿Desea eliminar la nota?', '', 'warning', 'success', 'Nota Eliminada');
-                                                                await deleteNote(noteID)
-                                                                    .then(() => {
-                                                                        loadData();
+                                        <CardHeader>
+                                            <div className="flex flex-col w-full">
+                                                <div className="flex flex-row justify-between">
+                                                    <h4 className="font-bold text-medium my-auto">Notas</h4>
+                                                    <div className="flex gap-2">
+                                                        {noteID.length > 0 &&
+                                                            <>
+                                                                <Button
+                                                                    isIconOnly
+                                                                    variant="light"
+                                                                    color="danger"
+                                                                    radius="sm"
+                                                                    size="sm"
+                                                                    onClick={async () => {
+                                                                        await sweetAlert('¿Desea eliminar la nota?', '', 'warning', 'success', 'Nota Eliminada');
+                                                                        await deleteNote(noteID)
+                                                                            .then(() => {
+                                                                                loadData();
+                                                                                reset({ name: '', content: '', object_id: parseInt(param.id), content_type: value === 'customer' ? 7 : 10 });
+                                                                                setNoteID('');
+                                                                            })
+                                                                            .catch((error) => {
+                                                                                console.error('Error: ', error);
+                                                                            })
+                                                                    }}>
+                                                                    <TrashIcon className="w-5 h-5" />
+                                                                </Button>
+                                                                <Button
+                                                                    isIconOnly
+                                                                    variant="light"
+                                                                    color="primary"
+                                                                    radius="sm"
+                                                                    size="sm"
+                                                                    onClick={() => {
                                                                         reset({ name: '', content: '', object_id: parseInt(param.id), content_type: value === 'customer' ? 7 : 10 });
                                                                         setNoteID('');
-                                                                    })
-                                                                    .catch((error) => {
-                                                                        console.error('Error: ', error);
-                                                                    })
-                                                            }}>
-                                                            <TrashIcon className="w-5 h-5" />
-                                                        </Button>
-                                                        <Button
-                                                            isIconOnly
-                                                            variant="light"
-                                                            color="primary"
-                                                            radius="sm"
-                                                            size="sm"
-                                                            onClick={() => {
-                                                                reset({ name: '', content: '', object_id: parseInt(param.id), content_type: value === 'customer' ? 7 : 10 });
-                                                                setNoteID('');
-                                                            }}>
-                                                            <ArrowPathIcon className="w-5 h-5" />
-                                                        </Button>
-                                                    </>
-                                                }
-                                                {!noteID.length > 0 &&
-                                                    <Button
-                                                        isIconOnly
-                                                        color="primary"
-                                                        variant="light"
-                                                        radius="sm"
-                                                        size="sm"
-                                                        type="submit">
-                                                        <PlusIcon className="w-5 h-5" />
-                                                    </Button>
-                                                }
+                                                                    }}>
+                                                                    <ArrowPathIcon className="w-5 h-5" />
+                                                                </Button>
+                                                            </>
+                                                        }
+                                                        {!noteID.length > 0 &&
+                                                            <Button
+                                                                isIconOnly
+                                                                color="primary"
+                                                                variant="light"
+                                                                radius="sm"
+                                                                size="sm"
+                                                                type="submit">
+                                                                <PlusIcon className="w-5 h-5" />
+                                                            </Button>
+                                                        }
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <Controller
+                                                        name="name"
+                                                        control={control}
+                                                        rules={{ required: true }}
+                                                        render={({ field }) => (
+                                                            <Input
+                                                                {...field}
+                                                                label='Nombre'
+                                                                variant="underlined"
+                                                                isInvalid={errors.name ? true : false}
+                                                                isReadOnly={noteID.length > 0}
+                                                            />
+                                                        )}
+                                                    />
+                                                    <Controller
+                                                        name="content"
+                                                        control={control}
+                                                        rules={{ required: true }}
+                                                        render={({ field }) => (
+                                                            <Textarea
+                                                                {...field}
+                                                                label="Nota"
+                                                                placeholder="Escribe aquí . . ."
+                                                                variant="underlined"
+                                                                minRows={5}
+                                                                maxRows={5}
+                                                                maxLength={256}
+                                                                isInvalid={errors.content ? true : false}
+                                                                isReadOnly={noteID.length > 0}
+                                                            />
+                                                        )}
+                                                    />
+                                                </div>
                                             </div>
                                         </CardHeader>
-                                        <CardBody className="gap-2">
-                                            <Controller
-                                                name="name"
-                                                control={control}
-                                                rules={{ required: true }}
-                                                render={({ field }) => (
-                                                    <Input
-                                                        {...field}
-                                                        label='Nombre'
-                                                        variant="underlined"
-                                                        isInvalid={errors.name ? true : false}
-                                                        isReadOnly={noteID.length > 0}
-                                                    />
-                                                )}
-                                            />
-                                            <Controller
-                                                name="content"
-                                                control={control}
-                                                rules={{ required: true }}
-                                                render={({ field }) => (
-                                                    <Textarea
-                                                        {...field}
-                                                        label="Nota"
-                                                        placeholder="Escribe aquí . . ."
-                                                        variant="underlined"
-                                                        minRows={5}
-                                                        maxRows={5}
-                                                        maxLength={256}
-                                                        isInvalid={errors.content ? true : false}
-                                                        isReadOnly={noteID.length > 0}
-                                                    />
-                                                )}
-                                            />
-                                            <Table
-                                                aria-label="Notes Table"
-                                                hideHeader
-                                                radius="sm"
-                                                shadow="none"
-                                                selectionMode="single"
-                                                onRowAction={async (key) => {
-                                                    reset(...(await getNote(value === 'Clientes' ? 'customer' : 'personal', param.id, key)).data);
-                                                    setNoteID(key);
-                                                }}>
-                                                <TableHeader>
-                                                    <TableColumn></TableColumn>
-                                                </TableHeader>
-                                                <TableBody emptyContent={"No se encontraron notas"}>
-                                                    {notes.map((note) =>
-                                                        <TableRow key={note.id} className="cursor-pointer">
-                                                            {() => <TableCell>{note.name}</TableCell>}
-                                                        </TableRow>
-                                                    )}
-                                                </TableBody>
-                                            </Table>
-                                        </CardBody>
                                     </form>
+                                    <CardBody className="gap-2">
+                                        <Table
+                                            aria-label="Notes Table"
+                                            hideHeader
+                                            radius="sm"
+                                            shadow="none"
+                                            selectionMode="single"
+                                            onRowAction={async (key) => {
+                                                reset(...(await getNote(value === 'Clientes' ? 'customer' : 'personal', param.id, key)).data);
+                                                setNoteID(key);
+                                            }}>
+                                            <TableHeader>
+                                                <TableColumn></TableColumn>
+                                            </TableHeader>
+                                            <TableBody emptyContent={"No se encontraron notas"}>
+                                                {notes.map((note) =>
+                                                    <TableRow key={note.id} className="cursor-pointer">
+                                                        {() =>
+                                                            <TableCell>
+                                                                <div className="flex flex-col truncate max-w-sm md:max-w-md">
+                                                                    <p className="text-bold text-sm capitalize">{note.name}</p>
+                                                                    <p className="text-bold text-sm capitalize text-default-400">{note.content}</p>
+                                                                </div>
+                                                            </TableCell>
+                                                        }
+                                                    </TableRow>
+                                                )}
+                                            </TableBody>
+                                        </Table>
+                                    </CardBody>
                                 </Card>
                             </div>
                         </div>
