@@ -45,7 +45,7 @@ class Personal(models.Model):
     first_surname = models.CharField(max_length=30)
     second_surname = models.CharField(max_length=30)
     birthdate = models.DateField()
-    dni = models.CharField(max_length=16, validators=[MinLengthValidator(16)])
+    dni = models.CharField(max_length=16, unique=True, validators=[MinLengthValidator(16)])
     phone_number = models.CharField(max_length=8)
     email = models.EmailField(max_length=255, blank=False)
     note = GenericRelation(Notes)
