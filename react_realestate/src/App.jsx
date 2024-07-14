@@ -11,7 +11,6 @@ import SalesDetail from './components/Main/SalesDetail';
 import PDF from './components/Main/PDF';
 import Settings from './components/Main/Settings';
 import PlotModal from './components/Main/PlotModal'
-
 import PasswordResetRequest from './components/Login/PasswordResetRequest';
 import PasswordResetConfirm from './components/Login/PasswordResetConfirm';
 
