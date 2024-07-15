@@ -5,6 +5,7 @@ import MainContext from '../components/Main/MainContext.js';
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/solid";
 
 export default function Main() {
+    const [name, setName] = React.useState('');
     const [isToggled, setToggled] = React.useState(true);
     const { titles } = React.useContext(MainContext);
     const location = useLocation();
@@ -35,6 +36,11 @@ export default function Main() {
         }
         return '';
     };
+
+    React.useEffect(() => {
+        setName(localStorage.getItem('name'));
+    }, []);
+
     return (
         <>
             <div className="flex h-[100vh]">
@@ -52,7 +58,7 @@ export default function Main() {
                             <p className='flex items-center justify-center'>{getTitle()}</p>
                         </div>
                         <div className="mx-4 grow">
-                            <p className='flex items-center justify-end'></p>
+                            <p className='flex items-center justify-end'>{name}</p>
                         </div>
                     </div>
                     <div className='h-full p-2 overflow-auto'>
