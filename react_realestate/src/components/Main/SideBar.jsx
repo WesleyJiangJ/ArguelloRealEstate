@@ -57,7 +57,8 @@ export default function SideBar({ collapsed }) {
                     <MenuItem
                         icon={<ArrowLeftStartOnRectangleIcon className="h-5 w-5" />}
                         onClick={async () => {
-                            await sweetAlert('¿Estás seguro que deseas cerrar sesión?', '', 'question', 'success', 'Hasta luego');
+                            await sweetAlert('¿Estás seguro que deseas cerrar sesión?', '', 'question', 'success', `Hasta luego, ${localStorage.getItem('name')}`);
+                            localStorage.removeItem('name');
                             localStorage.removeItem('access_token');
                             localStorage.removeItem('refresh_token');
                             navigate('/');
