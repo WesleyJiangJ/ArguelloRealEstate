@@ -2,7 +2,8 @@ import React from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from "react-hook-form"
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Link, useDisclosure } from "@nextui-org/react";
+import { getUser } from '../../api/apiFunctions'
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Link } from "@nextui-org/react";
 import { UserIcon, LockClosedIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import Login from '../../assets/images/login.jpg'
 
@@ -26,6 +27,8 @@ export default function LoginModal({ isOpen, onOpenChange }) {
             localStorage.setItem('access_token', response.data.access);
             localStorage.setItem('refresh_token', response.data.refresh);
             navigate('/main/customer');
+            const name = (await getUser(data.username)).data;
+            localStorage.setItem('name', `${name[0].first_name} ${name[0].last_name}`);
             reset();
         } catch (error) {
             setError('username');
