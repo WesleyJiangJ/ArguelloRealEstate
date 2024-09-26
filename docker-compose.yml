@@ -1,0 +1,20 @@
+services:
+  backend:
+    container_name: django_backend_ARE
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+  frontend:
+    container_name: react_frontend_ARE
+    build:
+      context: ./react_realestate
+      dockerfile: Dockerfile
+    volumes:
+      - ./react_realestate:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
