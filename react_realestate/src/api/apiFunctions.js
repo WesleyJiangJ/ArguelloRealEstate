@@ -5,6 +5,7 @@
 import axios from 'axios'
 import { sweetAlert, sweetToast } from '../components/Main/Alert'
 
+const apiURL = import.meta.env.VITE_API_URL;
 const createAPIInstance = (baseURL) => {
     const apiInstance = axios.create({
         baseURL: baseURL,
@@ -28,7 +29,7 @@ const createAPIInstance = (baseURL) => {
             originalRequest._retry = true;
             const refreshToken = localStorage.getItem('refresh_token');
             try {
-                const response = await axios.post('http://localhost:8000/api/token/refresh/', {
+                const response = await axios.post(`${apiURL}/api/token/refresh/`, {
                     refresh: refreshToken,
                 });
                 localStorage.setItem('access_token', response.data.access);
@@ -47,18 +48,18 @@ const createAPIInstance = (baseURL) => {
     return apiInstance;
 };
 
-const userAPI = createAPIInstance('http://localhost:8000/user/');
-const customerAPI = createAPIInstance('http://localhost:8000/customer/');
-const personalAPI = createAPIInstance('http://localhost:8000/personal/');
-const notesAPI = createAPIInstance('http://localhost:8000/notes/');
-const plotAPI = createAPIInstance('http://localhost:8000/plot/');
-const salesAPI = createAPIInstance('http://localhost:8000/sale/');
-const installmentAPI = createAPIInstance('http://localhost:8000/installment/');
-const commissionAPI = createAPIInstance('http://localhost:8000/commission/');
-const penaltyAPI = createAPIInstance('http://localhost:8000/penalty/');
-const penaltyHistoryAPI = createAPIInstance('http://localhost:8000/penalty_history/');
-const penaltyPaymentAPI = createAPIInstance('http://localhost:8000/penalty_payments/');
-const pdfInfoAPI = createAPIInstance('http://localhost:8000/pdfinfo/');
+const userAPI = createAPIInstance(`${apiURL}/user/`);
+const customerAPI = createAPIInstance(`${apiURL}/customer/`);
+const personalAPI = createAPIInstance(`${apiURL}/personal/`);
+const notesAPI = createAPIInstance(`${apiURL}/notes/`);
+const plotAPI = createAPIInstance(`${apiURL}/plot/`);
+const salesAPI = createAPIInstance(`${apiURL}/sale/`);
+const installmentAPI = createAPIInstance(`${apiURL}/installment/`);
+const commissionAPI = createAPIInstance(`${apiURL}/commission/`);
+const penaltyAPI = createAPIInstance(`${apiURL}/penalty/`);
+const penaltyHistoryAPI = createAPIInstance(`${apiURL}/penalty_history/`);
+const penaltyPaymentAPI = createAPIInstance(`${apiURL}/penalty_payments/`);
+const pdfInfoAPI = createAPIInstance(`${apiURL}/pdfinfo/`);
 
 // User
 export const getUser = (email) => {
@@ -228,7 +229,7 @@ export const patchPDFInformation = (id, data) => {
 export const downloadDatabase = async () => {
     try {
         await sweetAlert('¿Desea exportar la base de datos?', '', 'question', 'success', '', '');
-        const response = await axios.get('http://localhost:8000/export-database/', {
+        const response = await axios.get(`${apiURL}/export-database/`, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('access_token')}`
             },
@@ -253,7 +254,7 @@ export const handleFileUpload = async (file) => {
     const formData = new FormData();
     formData.append('database', file);
     try {
-        const response = await axios.post('http://localhost:8000/import-database/', formData, {
+        const response = await axios.post(`${apiURL}/import-database`, formData, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
                 'Content-Type': 'multipart/form-data'
