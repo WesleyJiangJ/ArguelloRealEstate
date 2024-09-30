@@ -8,6 +8,7 @@ import { UserIcon, LockClosedIcon, EyeIcon, EyeSlashIcon } from '@heroicons/reac
 import Login from '../../assets/images/login.jpg'
 
 export default function LoginModal({ isOpen, onOpenChange }) {
+    const apiURL = import.meta.env.VITE_API_URL;
     const navigate = useNavigate();
     const [isVisiblePassword, setIsVisiblePassword] = React.useState(false);
     const toggleVisibility = () => setIsVisiblePassword(!isVisiblePassword);
@@ -20,7 +21,7 @@ export default function LoginModal({ isOpen, onOpenChange }) {
 
     const onSubmit = async (data) => {
         try {
-            const response = await axios.post('http://localhost:8000/api/token/', {
+            const response = await axios.post(`${apiURL}/api/token/`, {
                 username: data.username,
                 password: data.password,
             });

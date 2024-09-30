@@ -6,6 +6,7 @@ import { Card, CardHeader, CardBody, CardFooter, Divider, Button, Input } from "
 import { sweetToast } from '../Main/Alert';
 
 export default function PasswordResetConfirm() {
+    const apiURL = import.meta.env.VITE_API_URL;
     const { uidb64, token } = useParams();
     const navigate = useNavigate();
     const { control, handleSubmit, formState: { errors }, setError } = useForm({
@@ -23,7 +24,7 @@ export default function PasswordResetConfirm() {
             return;
         }
         try {
-            await axios.post(`http://localhost:8000/api/password_reset_confirm/${uidb64}/${token}/`, {
+            await axios.post(`${apiURL}/api/password_reset_confirm/${uidb64}/${token}/`, {
                 new_password: data.newPassword,
                 confirm_password: data.confirmPassword,
             });

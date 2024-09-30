@@ -6,6 +6,7 @@ import { Card, CardHeader, CardBody, CardFooter, Divider, Button, Input } from "
 import { sweetToast } from '../Main/Alert';
 
 export default function PasswordResetRequest() {
+    const apiURL = import.meta.env.VITE_API_URL;
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = React.useState(false);
     const { control, handleSubmit, formState: { errors } } = useForm({
@@ -17,7 +18,7 @@ export default function PasswordResetRequest() {
     const onSubmit = async (data) => {
         try {
             setIsLoading(true);
-            await axios.post('http://localhost:8000/api/password_reset/', { email: data.email });
+            await axios.post(`${apiURL}/api/password_reset/`, { email: data.email });
             sweetToast('success', 'Compruebe su correo electrónico para un enlace de restablecimiento de contraseña');
             setIsLoading(false);
             navigate('/');
