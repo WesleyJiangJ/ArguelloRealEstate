@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
+from dotenv import load_dotenv, set_key
 from django.core.mail import send_mail
 from django.conf import settings
 from django.urls import reverse
@@ -187,12 +188,13 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
+        load_dotenv()
         try:
             info = PDFInformation.objects.first()
             user_email = info.backup_email
             user_password = info.app_password
-            set_env_variable("EMAIL_HOST_USER", user_email)
-            set_env_variable("EMAIL_HOST_PASSWORD", user_password)
+            set_key(".env", "EMAIL_HOST_USER", user_email)
+            set_key(".env", "EMAIL_HOST_PASSWORD", user_password)
         except PDFInformation.DoesNotExist:
             pass
         return token
