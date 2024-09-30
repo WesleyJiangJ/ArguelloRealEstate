@@ -1,32 +1,25 @@
 import os
 from pathlib import Path
 from datetime import timedelta
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-ENV_FILE = os.path.join(BASE_DIR, "RealEstate", ".env")
 
-# Read variables from .env
-env_file = os.path.join(os.path.dirname(__file__), ".env")
-with open(env_file) as f:
-    for line in f:
-        if line.strip():
-            key, value = line.strip().split("=", 1)
-            os.environ[key.strip()] = value.strip().strip('"')
+# Load Environment Variables
+load_dotenv()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "0").lower() in ["true", "t", "1"]
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split(" ")
 
-
-# Application definitio
+# Application definition
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -44,6 +37,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -115,14 +109,26 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
+
+# Folder where Django will copy all static files when using 'collectstatic'
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+
+# Add static directories only in development mode
+if DEBUG:
+    STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+
+# Production-specific configurations
+if not DEBUG:
+    # Production-optimized static file store with WhiteNoise
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # CORS Authorization
-CORS_ALLOWED_ORIGINS = ["http://localhost:5173"]
+CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS").split(" ")
 
 # API Documentation
 REST_FRAMEWORK = {
