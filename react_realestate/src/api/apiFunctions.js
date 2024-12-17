@@ -254,7 +254,7 @@ export const handleFileUpload = async (file) => {
     const formData = new FormData();
     formData.append('database', file);
     try {
-        const response = await axios.post(`${apiURL}/import-database`, formData, {
+        const response = await axios.post(`${apiURL}/import-database/`, formData, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
                 'Content-Type': 'multipart/form-data'
